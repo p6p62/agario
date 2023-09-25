@@ -1,0 +1,35 @@
+@startuml Agario MVC Linked
+hide circle
+hide members
+
+entity AgarioModel
+entity AgarioMenu
+entity ControllerGame
+entity ViewGame
+entity ControllerMenu
+entity ViewMenu
+
+AgarioModel <.. ControllerGame
+AgarioModel <.. ViewGame
+
+ViewGame <.. ControllerGame
+
+ControllerGame <|-- ControllerGameWPF
+ControllerGame <|-- ControllerGameConsole
+
+ViewGame <|-- ViewGameWPF
+ViewGame <|-- ViewGameConsole
+
+AgarioMenu <.. ControllerMenu
+AgarioMenu <.. ViewMenu
+
+ViewMenu <.. ControllerMenu
+
+ViewMenu <|-- ViewMenuWPF
+ViewMenu <|-- ViewMenuConsole
+
+ControllerMenu <|-- ControllerMenuWPF
+ControllerMenu <|-- ControllerMenuConsole
+
+ControllerGame <-- ControllerMenu
+@enduml

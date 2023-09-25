@@ -1,0 +1,27 @@
+@startuml Диаграмма последовательности для процесса игры
+actor Игрок as player
+participant "Приложение" as application
+participant "Игра Agario" as game
+
+player -> application: Запуск приложения
+activate application
+player <- application: Отображение меню
+|||
+player -> application: Выбор пункта "Играть"
+application -> game: Запуск игры
+activate game
+player <- game: Отображение экрана игры
+|||
+== Игровая сессия ==
+player -> game: Перемещение, поглощение еды и других клеток, набор массы
+player -> game: Установка паузы
+game <- game: Переход в приостановленное состояние
+player -> game: Снятие паузы
+game <- game: Восстановление активного состояния
+== Завершение игры ==
+player -> game: Потеря всей массы или выход из игры
+application <- game: Завершение игры
+deactivate game
+application <- application: Сохранение в глобальную таблицу лидеров по необходимости
+player <- application : Отображение меню
+@enduml
