@@ -18,6 +18,19 @@ namespace ViewsWPF.Menu
   internal class MenuItemViewWPF : MenuItemView
   {
     /// <summary>
+    /// Отступ элементов от боковых сторон
+    /// </summary>
+    public const int ITEMS_LEFT_RIGHT_MARGIN = 30;
+    /// <summary>
+    /// Отступ элементов по вертикали
+    /// </summary>
+    public const int ITEMS_UP_DOWN_MARGIN = 15;
+    /// <summary>
+    /// Внутренний отступ текста в элементах
+    /// </summary>
+    public const int ITEMS_PADDING = 7;
+
+    /// <summary>
     /// Логический родитель представления
     /// </summary>
     private FrameworkElement _parent = null!;
@@ -25,7 +38,14 @@ namespace ViewsWPF.Menu
     /// <summary>
     /// Прямоугольник для отображения элемента меню
     /// </summary>
-    private readonly TextBlock _menuItemFigure = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, TextAlignment = TextAlignment.Center };
+    private readonly TextBlock _menuItemFigure = new()
+    {
+      HorizontalAlignment = HorizontalAlignment.Stretch,
+      VerticalAlignment = VerticalAlignment.Center,
+      TextAlignment = TextAlignment.Center,
+      Margin = new(ITEMS_LEFT_RIGHT_MARGIN, ITEMS_UP_DOWN_MARGIN, ITEMS_LEFT_RIGHT_MARGIN, ITEMS_UP_DOWN_MARGIN),
+      Padding = new(ITEMS_PADDING)
+    };
 
     /// <summary>
     /// Логический родитель представления
@@ -58,13 +78,13 @@ namespace ViewsWPF.Menu
     {
       if (MenuElement.State == MenuItem.MenuItemState.Focused)
       {
-        _menuItemFigure.Background = Brushes.White;
-        _menuItemFigure.Foreground = Brushes.Black;
+        _menuItemFigure.Background = new SolidColorBrush(ViewProperties.MENU_ITEMS_BACKGROUND_COLOR);
+        _menuItemFigure.Foreground = new SolidColorBrush(ViewProperties.MENU_FOCUSED_ELEMENT_TEXT_COLOR);
       }
       else
       {
-        _menuItemFigure.Background = new SolidColorBrush(ViewProperties.BROWN_COLOR);
-        _menuItemFigure.Foreground = Brushes.White;
+        _menuItemFigure.Background = new SolidColorBrush(ViewProperties.MENU_ITEMS_BACKGROUND_COLOR);
+        _menuItemFigure.Foreground = new SolidColorBrush(ViewProperties.MENU_SCREENS_TEXT_COLOR);
       }
     }
   }

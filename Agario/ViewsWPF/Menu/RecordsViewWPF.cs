@@ -53,27 +53,19 @@ namespace ViewsWPF.Menu
     /// <returns>Настроенный экран представления пункта меню</returns>
     private Grid GetScreenLayout()
     {
-      const int BORDER_THICKNESS = 3;
       const int GRID_MARGIN = 7;
 
-      Brush backBrownBrush = new SolidColorBrush(ViewProperties.BROWN_COLOR);
+      Brush backgroundBrush = new SolidColorBrush(ViewProperties.MENU_ITEMS_BACKGROUND_COLOR);
       Brush textBrush = new SolidColorBrush(ViewProperties.MENU_SCREENS_TEXT_COLOR);
-      Grid recordsScreenGrid = new() { Background = backBrownBrush };
+      Grid recordsScreenGrid = new() { Background = backgroundBrush };
       recordsScreenGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
       recordsScreenGrid.RowDefinitions.Add(new RowDefinition());
       recordsScreenGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
 
       TextBlock captionTextBlock = new() { Text = "Рекорды", FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = textBrush, Margin = new(GRID_MARGIN) };
       _recordsTable = new() { Margin = new(GRID_MARGIN) };
-      Border backButtonBorder = new()
-      {
-        BorderThickness = new(BORDER_THICKNESS),
-        BorderBrush = System.Windows.Media.Brushes.White,
-        Child = new TextBlock() { Text = "Назад", FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = textBrush },
-        Margin = new(GRID_MARGIN)
-      };
       StackPanel backButtonPanel = new() { Orientation = Orientation.Horizontal };
-      backButtonPanel.Children.Add(backButtonBorder);
+      backButtonPanel.Children.Add(new TextBlock() { Text = "Назад", FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = new SolidColorBrush(ViewProperties.BACK_BUTTON_COLOR) });
 
       Grid.SetRow(captionTextBlock, 0);
       Grid.SetRow(_recordsTable, 1);
@@ -120,17 +112,18 @@ namespace ViewsWPF.Menu
       _recordsTable.Children.Clear();
       _recordsTable.RowDefinitions.Clear();
 
-      Brush textBrush = new SolidColorBrush(ViewProperties.MENU_SCREENS_TEXT_COLOR);
       const int RECORD_TEXT_SIZE = 32;
 
+      Brush subcaptionBrush = new SolidColorBrush(ViewProperties.MENU_SUBCAPTION_COLOR);
       List<Record> records = GameRecordsHandlerWPF.GetRecords();
       DockPanel captionRow = new();
-      captionRow.Children.Add(new TextBlock() { Text = "Имя", Foreground = textBrush, FontSize = RECORD_TEXT_SIZE, TextAlignment = TextAlignment.Left });
-      captionRow.Children.Add(new TextBlock() { Text = "Очки", Foreground = textBrush, FontSize = RECORD_TEXT_SIZE, TextAlignment = TextAlignment.Right });
+      captionRow.Children.Add(new TextBlock() { Text = "Имя", Foreground = subcaptionBrush, FontSize = RECORD_TEXT_SIZE, TextAlignment = TextAlignment.Left });
+      captionRow.Children.Add(new TextBlock() { Text = "Рейтинг", Foreground = subcaptionBrush, FontSize = RECORD_TEXT_SIZE, TextAlignment = TextAlignment.Right });
       Grid.SetColumn(captionRow, 0);
       _recordsTable.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
       _recordsTable.Children.Add(captionRow);
 
+      Brush textBrush = new SolidColorBrush(ViewProperties.MENU_SCREENS_TEXT_COLOR);
       int counter = 1;
       foreach (Record elRecord in records)
       {

@@ -18,6 +18,19 @@ namespace ViewsWPF.Menu
   public class MenuViewWPF : MenuView
   {
     /// <summary>
+    /// Заголовок окна
+    /// </summary>
+    public const string TITLE = "Agario";
+    /// <summary>
+    /// Высота окна
+    /// </summary>
+    public const int HEIGHT = 600;
+    /// <summary>
+    /// Ширина окна
+    /// </summary>
+    public const int WIDTH = 375;
+
+    /// <summary>
     /// Выбран следующий
     /// </summary>
     public event Action? NextFocused = null;
@@ -33,7 +46,7 @@ namespace ViewsWPF.Menu
     /// <summary>
     /// Экран представления меню
     /// </summary>
-    private readonly Grid _menuGrid = new() { Background = new SolidColorBrush(ViewProperties.BROWN_COLOR) };
+    private readonly Grid _menuGrid = new() { Background = new SolidColorBrush(Colors.White) };
 
     /// <summary>
     /// Элементы меню
@@ -52,7 +65,7 @@ namespace ViewsWPF.Menu
     /// <param name="parMenuWindow">Окно меню</param>
     public MenuViewWPF(AgarioModels.Menu.Menu parMenu, Window? parMenuWindow) : base(parMenu)
     {
-      MenuWindow = parMenuWindow ?? new Window() { Title = "Agario", Height = 600, Width = 375, MinWidth = 50, MinHeight = 80 };
+      MenuWindow = parMenuWindow ?? new Window() { Title = TITLE, Height = HEIGHT, Width = WIDTH, MinWidth = 50, MinHeight = 80 };
 
       _menuGrid.Focusable = true;
       _menuGrid.RowDefinitions.Clear();

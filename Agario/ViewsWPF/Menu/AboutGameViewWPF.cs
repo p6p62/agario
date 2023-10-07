@@ -96,11 +96,9 @@ namespace ViewsWPF.Menu
     /// <returns>Настроенный экран представления</returns>
     private Grid GetScreenLayout()
     {
-      const int BORDER_THICKNESS = 3;
-      const int ARROWS_MARGIN_LEFT = 30;
       const int GRID_MARGIN = 7;
 
-      Grid grid = new() { Background = new SolidColorBrush(ViewProperties.BROWN_COLOR) };
+      Grid grid = new() { Background = new SolidColorBrush(ViewProperties.MENU_ITEMS_BACKGROUND_COLOR) };
       grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
       grid.RowDefinitions.Add(new RowDefinition());
       grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
@@ -108,12 +106,10 @@ namespace ViewsWPF.Menu
       SolidColorBrush textBrush = new(ViewProperties.MENU_SCREENS_TEXT_COLOR);
       TextBlock captionTextBlock = new() { Text = "Об игре", FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = textBrush, Margin = new(GRID_MARGIN) };
       _aboutGameTextBlock = new() { Text = _pageSeparatedText[0], TextWrapping = TextWrapping.Wrap, Foreground = textBrush, FontSize = ViewProperties.MENU_TEXT_SIZE, Margin = new(GRID_MARGIN) };
-      _pageNumberTextBlock = new() { FontSize = ViewProperties.MENU_TEXT_SIZE, Foreground = textBrush };
-      Border backButtonBorder = new() { BorderThickness = new(BORDER_THICKNESS), BorderBrush = System.Windows.Media.Brushes.White };
-      backButtonBorder.Child = new TextBlock() { Text = "Назад", FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = textBrush };
+      _pageNumberTextBlock = new() { FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = new SolidColorBrush(ViewProperties.MENU_SUBCAPTION_COLOR) };
+
       StackPanel bottomPanel = new() { Orientation = Orientation.Horizontal, Margin = new(GRID_MARGIN) };
-      bottomPanel.Children.Add(backButtonBorder);
-      bottomPanel.Children.Add(new TextBlock() { Text = "⇦ ⇨", FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = textBrush, Margin = new(ARROWS_MARGIN_LEFT, 0, 0, 0) });
+      bottomPanel.Children.Add(new TextBlock() { Text = "Назад", FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = new SolidColorBrush(ViewProperties.BACK_BUTTON_COLOR) });
       bottomPanel.Children.Add(_pageNumberTextBlock);
 
       Grid.SetRow(captionTextBlock, 0);
@@ -156,7 +152,7 @@ namespace ViewsWPF.Menu
       _screen.Focus();
       _window.Content = _screen;
       _aboutGameTextBlock.Text = _pageSeparatedText[_pageNumber];
-      _pageNumberTextBlock.Text = $"{_pageNumber + 1}/{_pagesCount}";
+      _pageNumberTextBlock.Text = $"<{_pageNumber + 1}/{_pagesCount}>";
     }
 
     /// <summary>
