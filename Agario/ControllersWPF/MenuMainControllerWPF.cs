@@ -53,13 +53,13 @@ namespace ControllersWPF
       _aboutGameControllerWPF = new(_window);
       _recordsControllerWPF = new(_window);
 
-      Menu[(int)MenuMain.MenuItemCodes.StartGame].Selected += _gameControllerWPF.StartGame;
+      Menu[(int)MenuMain.MenuItemCodes.StartGame].Selected += _gameControllerWPF.Start;
       Menu[(int)MenuMain.MenuItemCodes.About].Selected += _aboutGameControllerWPF.Start;
       Menu[(int)MenuMain.MenuItemCodes.Records].Selected += _recordsControllerWPF.Start;
       Menu[(int)MenuMain.MenuItemCodes.Exit].Selected += System.Diagnostics.Process.GetCurrentProcess().Kill;
 
       // TODO
-
+      _gameControllerWPF.GoToBack += DrawMenu;
       _aboutGameControllerWPF.GoToBack += DrawMenu;
       _recordsControllerWPF.GoToBack += DrawMenu;
     }

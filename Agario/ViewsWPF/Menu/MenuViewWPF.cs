@@ -88,10 +88,12 @@ namespace ViewsWPF.Menu
     }
 
     /// <summary>
-    /// Оторбражение меню
+    /// Отображение меню
     /// </summary>
     public override void Draw()
     {
+      MenuWindow.Width = WIDTH;
+      MenuWindow.Height = HEIGHT;
       _menuGrid.Focus();
       MenuWindow.Content = _menuGrid;
       if (!MenuWindow.IsVisible)
