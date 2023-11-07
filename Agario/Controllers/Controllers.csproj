@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Agario\AgarioModels.csproj" />
+    <ProjectReference Include="..\Views\Views.csproj" />
   </ItemGroup>
 
 </Project>
