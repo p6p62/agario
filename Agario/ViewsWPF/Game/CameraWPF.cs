@@ -19,10 +19,10 @@ namespace ViewsWPF.Game
     /// <param name="parGame">Экземпляр игры</param>
     public CameraWPF(AgarioGame parGame) : base(parGame)
     {
-      const float ADDITIONAL_SCALE_X = 0.2f;
-      const float ADDITIONAL_SCALE_Y = 0.2f;
+      const float ADDITIONAL_SCALE_X = 1.2f;
+      const float ADDITIONAL_SCALE_Y = 1.2f;
 
-      TrackedPlayer = GameInstance.GameField.Players.Find(p => p.Name == AgarioGame.TEST_PLAYER_NAME);
+      //TrackedPlayer = GameInstance.GameField.Players.Find(p => p.Name == AgarioGame.TEST_PLAYER_NAME);
       CameraWidth = GameField.Width * ADDITIONAL_SCALE_X;
       CameraHeight = GameField.Height * ADDITIONAL_SCALE_Y;
 

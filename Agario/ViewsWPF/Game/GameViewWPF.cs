@@ -129,6 +129,8 @@ namespace ViewsWPF.Game
       GameInstance.GameField.Food.ForEach(OnEatCreated);
 
       GameInstance.GameField.PlayerCreated += OnPlayerCreated;
+      GameInstance.GameField.PlayerDead += OnPlayerDead;
+      GameInstance.GameField.PlayerReborn += OnPlayerReborn;
       GameInstance.GameField.EatCreated += OnEatCreated;
       GameInstance.GameField.FoodEaten += OnFoodEaten;
       GameInstance.CanRender += OnCanRender;
@@ -202,6 +204,36 @@ namespace ViewsWPF.Game
         _gameScreen.Children.Add(elCellFigure);
       _gameScreen.Children.Add(playerFigure.PlayerText);
       _playerShapes.Add(parPlayer, playerFigure);
+    }
+
+    /// <summary>
+    /// Обработка смерти игрока
+    /// </summary>
+    /// <param name="parPlayer">Умерший игрок</param>
+    private void OnPlayerDead(Player parPlayer)
+    {
+      PlayerFigure playerFigure = _playerShapes[parPlayer];
+      Application.Current.Dispatcher.Invoke(() =>
+      {
+        playerFigure.PlayerText.Visibility = Visibility.Hidden;
+        foreach (Ellipse elCellFigure in playerFigure.CellFigures)
+          elCellFigure.Visibility = Visibility.Hidden;
+      });
+    }
+
+    /// <summary>
+    /// Обработка возрождения игрока
+    /// </summary>
+    /// <param name="parPlayer">Возрождённый игрок</param>
+    private void OnPlayerReborn(Player parPlayer)
+    {
+      PlayerFigure playerFigure = _playerShapes[parPlayer];
+      Application.Current.Dispatcher.Invoke(() =>
+      {
+        playerFigure.PlayerText.Visibility = Visibility.Visible;
+        foreach (Ellipse elCellFigure in playerFigure.CellFigures)
+          elCellFigure.Visibility = Visibility.Visible;
+      });
     }
 
     /// <summary>
