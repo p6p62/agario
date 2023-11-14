@@ -28,9 +28,19 @@ namespace AgarioModels.Game
     private const int EAT_GENERATION_COUNT_PER_PERIOD = 40;
 
     /// <summary>
+    /// Соотношение площади перерытия клетки еды и другой клетки к площади всей клетки еды,
+    /// чтобы она считалась съеденной накрывшей клеткой
+    /// </summary>
+    private const float EAT_OVERLAP_AREA = 0.6f;
+
+    /// <summary>
     /// Появление новой еды
     /// </summary>
     public event Action<Cell>? EatCreated;
+    /// <summary>
+    /// Съедение еды. Параметры Action - еда и игрок
+    /// </summary>
+    public event Action<Cell, Player>? FoodEaten;
     /// <summary>
     /// Появление нового игрока
     /// </summary>
@@ -149,6 +159,7 @@ namespace AgarioModels.Game
       }
 
       UpdateEat(parDeltaTime);
+      ProcessEating();
     }
 
     /// <summary>
@@ -243,6 +254,56 @@ namespace AgarioModels.Game
         Food.Add(eat);
         EatCreated?.Invoke(eat);
       }
+    }
+
+    /// <summary>
+    /// Обработка съедания ячейкой <paramref name="parCell"/> игрока <paramref name="parPlayer"/>
+    /// еды <paramref name="parEat"/>
+    /// </summary>
+    /// <param name="parPlayer"></param>
+    /// <param name="parCell"></param>
+    /// <param name="parEat"></param>
+    private void PlayerEatsFood(Player parPlayer, MovingCell parCell, Cell parEat)
+    {
+      parCell.Weight += parEat.Weight;
+      parPlayer.Score += parEat.Weight;
+      Food.Remove(parEat);
+      FoodEaten?.Invoke(parEat, parPlayer);
+    }
+
+    /// <summary>
+    /// Обработка процесса съедания еды для игрока
+    /// </summary>
+    /// <param name="parPlayer"></param>
+    private void ProcessEatingForPlayer(Player parPlayer)
+    {
+      MathFunctions.Rectangle playerRectangle = parPlayer.GetBoundingRect();
+      for (int i = Food.Count - 1; i >= 0; i--)
+      {
+        Cell eat = Food[i];
+        if (playerRectangle.IsIntersect(eat))
+        {
+          float eatArea = eat.Area;
+          foreach (MovingCell elPlayerCell in parPlayer.Cells)
+          {
+            float intersectionArea = MathFunctions.GetIntersectionArea(eat, elPlayerCell);
+            if (intersectionArea / eatArea >= EAT_OVERLAP_AREA)
+            {
+              PlayerEatsFood(parPlayer, elPlayerCell, eat);
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    /// <summary>
+    /// Обработка процесса съедания еды
+    /// </summary>
+    private void ProcessEating()
+    {
+      foreach (Player elPlayer in Players)
+        ProcessEatingForPlayer(elPlayer);
     }
   }
 }

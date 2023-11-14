@@ -110,6 +110,17 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Проверка пересечения клеток
+    /// </summary>
+    /// <param name="parCell1"></param>
+    /// <param name="parCell2"></param>
+    /// <returns></returns>
+    public static bool IsIntersect(Cell parCell1, Cell parCell2)
+    {
+      return Distance(parCell1, parCell2) >= parCell1.Radius + parCell2.Radius;
+    }
+
+    /// <summary>
     /// Вычисление радиуса клетки заданной массы <paramref name="parMass"/>
     /// </summary>
     /// <param name="parMass"></param>
@@ -128,6 +139,62 @@ namespace AgarioModels.Game
     public static Vector2 GetRectangleCenter(Rectangle parRectangle)
     {
       return new((parRectangle.X2 + parRectangle.X1) / 2, (parRectangle.Y2 + parRectangle.Y1) / 2);
+    }
+
+    /// <summary>
+    /// Расстояние между центрами клеток
+    /// </summary>
+    /// <param name="parCell1"></param>
+    /// <param name="parCell2"></param>
+    /// <returns></returns>
+    public static float Distance(Cell parCell1, Cell parCell2)
+    {
+      return (parCell1.Position - parCell2.Position).Length();
+    }
+
+    /// <summary>
+    /// Площадь клетки
+    /// </summary>
+    /// <param name="parCell"></param>
+    /// <returns></returns>
+    public static float Area(Cell parCell)
+    {
+      return MathF.PI * parCell.Radius * parCell.Radius;
+    }
+
+    /// <summary>
+    /// Проверка, вложена ли ячейка <paramref name="parCell1"/> в <paramref name="parCell2"/>
+    /// </summary>
+    /// <param name="parCell1"></param>
+    /// <param name="parCell2"></param>
+    /// <returns>True, если <paramref name="parCell1"/> вложена в <paramref name="parCell2"/></returns>
+    public static bool IsNestedIn(Cell parCell1, Cell parCell2)
+    {
+      return (Distance(parCell1, parCell2) < (parCell1.Radius + parCell2.Radius)) && (parCell1.Radius < parCell2.Radius);
+    }
+
+    /// <summary>
+    /// Вычисление площади пересечения двух окружностей
+    /// </summary>
+    /// <param name="parCell1"></param>
+    /// <param name="parCell2"></param>
+    /// <returns></returns>
+    public static float GetIntersectionArea(Cell parCell1, Cell parCell2)
+    {
+      float r1 = parCell1.Radius;
+      float r2 = parCell2.Radius;
+      float d = Distance(parCell1, parCell2);
+
+      float area;
+      if (d >= r1 + r2)
+        area = 0;
+      else if (IsNestedIn(parCell1, parCell2) || IsNestedIn(parCell2, parCell1))
+        area = MathF.Min(Area(parCell1), Area(parCell2));
+      else
+        area = r1 * r1 * MathF.Acos((d * d + r1 * r1 - r2 * r2) / (2 * d * r1))
+        + r2 * r2 * MathF.Acos((d * d + r2 * r2 - r1 * r1) / (2 * d * r2))
+        - 1.0f / 2.0f * MathF.Sqrt((-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2));
+      return area;
     }
   }
 }
