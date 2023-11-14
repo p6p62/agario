@@ -170,7 +170,7 @@ namespace AgarioModels.Game
     /// <returns>True, если <paramref name="parCell1"/> вложена в <paramref name="parCell2"/></returns>
     public static bool IsNestedIn(Cell parCell1, Cell parCell2)
     {
-      return (Distance(parCell1, parCell2) < (parCell1.Radius + parCell2.Radius)) && (parCell1.Radius < parCell2.Radius);
+      return (Distance(parCell1, parCell2) + parCell1.Radius < parCell2.Radius) && (parCell1.Radius < parCell2.Radius);
     }
 
     /// <summary>

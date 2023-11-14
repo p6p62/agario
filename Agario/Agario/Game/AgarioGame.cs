@@ -36,6 +36,10 @@ namespace AgarioModels.Game
     /// Тестовое имя игрока для отладки
     /// </summary>
     public const string TEST_PLAYER_NAME = "Test";
+    /// <summary>
+    /// Префикс для имени клеток, управляемых компьютером
+    /// </summary>
+    private const string COMPUTER_PLAYER_NAME_PREFIX = "Computer";
 
     /// <summary>
     /// Желаемая частота обновления внутреннего состояния игры
@@ -132,6 +136,14 @@ namespace AgarioModels.Game
       const int START_EAT_COUNT = 450;
 
       _gameField.AddPlayerOnRandomPosition(new() { Name = TEST_PLAYER_NAME });
+
+      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}1" });
+      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}2" });
+      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}3" });
+      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}4" });
+      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}5" });
+      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}6" });
+
       _gameField.CreateEat(START_EAT_COUNT);
     }
 

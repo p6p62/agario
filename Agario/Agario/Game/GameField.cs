@@ -28,10 +28,21 @@ namespace AgarioModels.Game
     private const int EAT_GENERATION_COUNT_PER_PERIOD = 40;
 
     /// <summary>
+    /// Время возрождения игрока (секунды)
+    /// </summary>
+    private const int PLAYER_REBORN_TIME = 3;
+
+    /// <summary>
     /// Соотношение площади перерытия клетки еды и другой клетки к площади всей клетки еды,
     /// чтобы она считалась съеденной накрывшей клеткой
     /// </summary>
-    private const float EAT_OVERLAP_AREA = 0.6f;
+    private const float EAT_OVERLAP_AREA_RATIO = 0.6f;
+
+    /// <summary>
+    /// Относительная разница масс, при превышении которой клетка может съесть меньшую клетку другого
+    /// игрока при перекрытии больше, чем EAT_OVERLAP_AREA_RATIO
+    /// </summary>
+    private const float EAT_RELATIVE_MASS_DIFFERENCE = 0.1f;
 
     /// <summary>
     /// Появление новой еды
@@ -70,6 +81,11 @@ namespace AgarioModels.Game
     private float _lastEatGenerationElapsedTime = 0;
 
     /// <summary>
+    /// Умершие игроки и время, которое осталось до их возрождения
+    /// </summary>
+    private readonly Dictionary<Player, float> _deadPlayers = new();
+
+    /// <summary>
     /// Ширина
     /// </summary>
     public float Width { get; set; }
@@ -97,15 +113,25 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Инициализация и размещение игрока на поле
+    /// </summary>
+    /// <param name="parPlayer"></param>
+    private void InitializePlayer(Player parPlayer)
+    {
+      parPlayer.Score = START_SCORE;
+      parPlayer.Cells.Clear();
+      parPlayer.Cells.Add(new() { Weight = START_SCORE });
+      parPlayer.IsAlive = true;
+      _cellPlaceholder.SetRandomPosition(parPlayer.Cells[0]);
+    }
+
+    /// <summary>
     /// Добавление игрока в случайное место на поле
     /// </summary>
     /// <param name="parPlayer">Добавляемый игрок</param>
     public void AddPlayerOnRandomPosition(Player parPlayer)
     {
-      parPlayer.Score = START_SCORE;
-      parPlayer.Cells.Clear();
-      parPlayer.Cells.Add(new() { Weight = START_SCORE });
-      _cellPlaceholder.SetRandomPosition(parPlayer.Cells[0]);
+      InitializePlayer(parPlayer);
 
       Players.Add(parPlayer);
       PlayerCreated?.Invoke(parPlayer);
@@ -147,6 +173,34 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Возрождение умершего игрока
+    /// </summary>
+    /// <param name="parPlayer"></param>
+    private void RebornDeadPlayer(Player parPlayer)
+    {
+      InitializePlayer(parPlayer);
+      _deadPlayers.Remove(parPlayer);
+      PlayerReborn?.Invoke(parPlayer);
+    }
+
+    /// <summary>
+    /// Возрождение умерших игроков через некоторый интервал времени
+    /// </summary>
+    /// <param name="parDeltaTime">Временной интервал, прошедший с момента последнего обновления</param>
+    private void RebornDeadPlayers(float parDeltaTime)
+    {
+      Dictionary<Player, float>.KeyCollection deadPlayers = _deadPlayers.Keys;
+      foreach (Player elPlayer in deadPlayers)
+      {
+        float newDeadTime = _deadPlayers[elPlayer] + parDeltaTime;
+        if (newDeadTime >= PLAYER_REBORN_TIME)
+          RebornDeadPlayer(elPlayer);
+        else
+          _deadPlayers[elPlayer] = newDeadTime;
+      }
+    }
+
+    /// <summary>
     /// Обновление состояния игры
     /// </summary>
     /// <param name="parDeltaTime">Изменение внутреннего игрового времени в секундах</param>
@@ -160,6 +214,7 @@ namespace AgarioModels.Game
 
       UpdateEat(parDeltaTime);
       ProcessEating();
+      RebornDeadPlayers(parDeltaTime);
     }
 
     /// <summary>
@@ -257,7 +312,7 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
-    /// Обработка съедания ячейкой <paramref name="parCell"/> игрока <paramref name="parPlayer"/>
+    /// Обработка съедания клеткой <paramref name="parCell"/> игрока <paramref name="parPlayer"/>
     /// еды <paramref name="parEat"/>
     /// </summary>
     /// <param name="parPlayer"></param>
@@ -272,10 +327,65 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
-    /// Обработка процесса съедания еды для игрока
+    /// Обработка съедания клеткой <paramref name="parPlayerCell"/> игрока <paramref name="parPlayer"/>
+    /// клетки <paramref name="parEatedPlayerCell"/> другого игрока <paramref name="parOtherPlayer"/>
     /// </summary>
     /// <param name="parPlayer"></param>
-    private void ProcessEatingForPlayer(Player parPlayer)
+    /// <param name="parPlayerCell"></param>
+    /// <param name="parOtherPlayer"></param>
+    /// <param name="parEatedPlayerCell"></param>
+    private void PlayerEatsOtherCell(Player parPlayer, MovingCell parPlayerCell, Player parOtherPlayer, MovingCell parEatedPlayerCell)
+    {
+      parPlayerCell.Weight += parEatedPlayerCell.Weight;
+      parPlayer.Score += parEatedPlayerCell.Weight;
+      parOtherPlayer.Score -= parEatedPlayerCell.Weight;
+
+      parOtherPlayer.Cells.Remove(parEatedPlayerCell);
+      if (parOtherPlayer.Cells.Count == 0)
+      {
+        parOtherPlayer.IsAlive = false;
+        _deadPlayers.Add(parOtherPlayer, 0);
+        PlayerDead?.Invoke(parOtherPlayer);
+      }
+    }
+
+    /// <summary>
+    /// Обработка съедания игроком клеток других игроков
+    /// </summary>
+    /// <param name="parPlayer"></param>
+    private void ProcessEatingOtherCellsForPlayer(Player parPlayer)
+    {
+      MathFunctions.Rectangle playerRectangle = parPlayer.GetBoundingRect();
+      foreach (Player elPlayer in Players)
+      {
+        if (elPlayer.IsAlive && playerRectangle.IsIntersect(elPlayer.GetBoundingRect()))
+        {
+          foreach (MovingCell elCell in parPlayer.Cells)
+          {
+            float elCellArea = elCell.Area;
+            for (int i = elPlayer.Cells.Count - 1; i >= 0; i--)
+            {
+              MovingCell otherPlayerCell = elPlayer.Cells[i];
+              float otherCellArea = otherPlayerCell.Area;
+              if (elCellArea > otherCellArea && ((elCellArea - otherCellArea) / elCellArea > EAT_RELATIVE_MASS_DIFFERENCE))
+              {
+                if (MathFunctions.GetIntersectionArea(elCell, otherPlayerCell) / otherCellArea > EAT_OVERLAP_AREA_RATIO)
+                  PlayerEatsOtherCell(parPlayer, elCell, elPlayer, otherPlayerCell);
+              }
+            }
+
+            if (elPlayer.Cells.Count == 0)
+              break;
+          }
+        }
+      }
+    }
+
+    /// <summary>
+    /// Обработка процесса съедания игроком еды
+    /// </summary>
+    /// <param name="parPlayer"></param>
+    private void ProcessEatingFoodForPlayer(Player parPlayer)
     {
       MathFunctions.Rectangle playerRectangle = parPlayer.GetBoundingRect();
       for (int i = Food.Count - 1; i >= 0; i--)
@@ -287,7 +397,7 @@ namespace AgarioModels.Game
           foreach (MovingCell elPlayerCell in parPlayer.Cells)
           {
             float intersectionArea = MathFunctions.GetIntersectionArea(eat, elPlayerCell);
-            if (intersectionArea / eatArea >= EAT_OVERLAP_AREA)
+            if (intersectionArea / eatArea >= EAT_OVERLAP_AREA_RATIO)
             {
               PlayerEatsFood(parPlayer, elPlayerCell, eat);
               break;
@@ -298,12 +408,17 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
-    /// Обработка процесса съедания еды
+    /// Обработка процесса съедания еды или клеток игроков
     /// </summary>
     private void ProcessEating()
     {
       foreach (Player elPlayer in Players)
-        ProcessEatingForPlayer(elPlayer);
+      {
+        if (!elPlayer.IsAlive)
+          continue;
+        ProcessEatingOtherCellsForPlayer(elPlayer);
+        ProcessEatingFoodForPlayer(elPlayer);
+      }
     }
   }
 }

@@ -217,7 +217,7 @@ namespace Views.Game
       List<Player> playersInViewport = new();
       Rectangle cameraRectangle = GetCameraRectangle();
       foreach (Player elPlayer in GameField.Players)
-        if (cameraRectangle.IsIntersect(elPlayer.GetBoundingRect()))
+        if (elPlayer.IsAlive && cameraRectangle.IsIntersect(elPlayer.GetBoundingRect()))
           playersInViewport.Add(elPlayer);
       return playersInViewport;
     }
