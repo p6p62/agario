@@ -39,6 +39,12 @@ namespace AgarioModels.Game
     public float Radius { get; set; }
 
     /// <summary>
+    /// Площадь клетки
+    /// </summary>
+    /// <returns></returns>
+    public float Area => MathFunctions.Area(this);
+
+    /// <summary>
     /// Конструктор по умолчанию
     /// </summary>
     public Cell()
