@@ -30,6 +30,11 @@ namespace AgarioModels.Game
     public List<MovingCell> Cells { get; private set; } = new();
 
     /// <summary>
+    /// Состояние игрока (живой, мёртвый)
+    /// </summary>
+    public bool IsAlive { get; set; } = true;
+
+    /// <summary>
     /// Получение минимального ограничивающего прямоугольника, включающего все клетки игрока
     /// </summary>
     /// <returns>Ограничивающий прямоугольник минимального размера</returns>
