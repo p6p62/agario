@@ -51,11 +51,12 @@ namespace ViewsWPF.Game
       /// <param name="parPlayer">Игрок</param>
       /// <param name="parCellFillingBrush">Кисть для заполнения клеток игрока</param>
       /// <param name="parCellFigures">Фигуры для клеток игрока</param>
-      public PlayerFigure(Player parPlayer, Brush parCellFillingBrush, List<Ellipse> parCellFigures)
+      public PlayerFigure(Player parPlayer, Brush parCellFillingBrush, List<Ellipse> parCellFigures, TextBlock parPlayerText)
       {
         Player = parPlayer;
         CellFillingBrush = parCellFillingBrush;
         CellFigures = parCellFigures;
+        PlayerText = parPlayerText;
       }
     }
 
@@ -129,6 +130,7 @@ namespace ViewsWPF.Game
 
       GameInstance.GameField.PlayerCreated += OnPlayerCreated;
       GameInstance.GameField.EatCreated += OnEatCreated;
+      GameInstance.GameField.FoodEaten += OnFoodEaten;
       GameInstance.CanRender += OnCanRender;
     }
 
@@ -172,16 +174,17 @@ namespace ViewsWPF.Game
     /// <returns>Фигура игрока</returns>
     private PlayerFigure CreatePlayerFigure(Player parPlayer)
     {
+      const int STROKE_THICKNESS = 2;
       SolidColorBrush randomColorBrush = new(GetRandomColor());
       List<Ellipse> playerCells = new();
       int count = parPlayer.Cells.Count;
       while (--count >= 0)
       {
-        Ellipse cellFigure = new() { Fill = randomColorBrush };
+        Ellipse cellFigure = new() { Fill = randomColorBrush, Stroke = _blackSolidBrush, StrokeThickness = STROKE_THICKNESS };
         playerCells.Add(cellFigure);
       }
       TextBlock playerText = new() { Text = parPlayer.Name, FontSize = 20 };
-      return new(parPlayer, randomColorBrush, playerCells) { PlayerText = playerText };
+      return new(parPlayer, randomColorBrush, playerCells, playerText);
     }
 
     /// <summary>
@@ -217,6 +220,21 @@ namespace ViewsWPF.Game
         Ellipse eatFigure = new() { Fill = randomColorBrush };
         _gameScreen.Children.Add(eatFigure);
         _eatShapes.Add(parEat, eatFigure);
+      });
+    }
+
+    /// <summary>
+    /// Обработка съедания еды
+    /// </summary>
+    /// <param name="parEat"></param>
+    /// <param name="_"></param>
+    private void OnFoodEaten(Cell parEat, Player _)
+    {
+      Application.Current.Dispatcher.Invoke(() =>
+      {
+        _eatShapes.Remove(parEat, out Ellipse? outEatShape);
+        if (outEatShape != null)
+          _gameScreen.Children.Remove(outEatShape);
       });
     }
 
