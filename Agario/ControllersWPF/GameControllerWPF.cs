@@ -167,7 +167,8 @@ namespace ControllersWPF
 
       // TODO починить при наличии зависимости от масштаба
       // перевод в размеры, сопоставимые с игровым полем
-      speedVector *= GameView.Camera.CameraToScreenScaleFactor;
+      const float MULTIPLIER = 3;
+      speedVector *= GameView.Camera.CameraToScreenScaleFactor * MULTIPLIER;
 
       SetPlayerSpeed(speedVector);
     }
