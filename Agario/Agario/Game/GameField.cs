@@ -42,7 +42,7 @@ namespace AgarioModels.Game
     /// Относительная разница масс, при превышении которой клетка может съесть меньшую клетку другого
     /// игрока при перекрытии больше, чем EAT_OVERLAP_AREA_RATIO
     /// </summary>
-    private const float EAT_RELATIVE_MASS_DIFFERENCE = 0.1f;
+    public const float EAT_RELATIVE_MASS_DIFFERENCE = 0.1f;
 
     /// <summary>
     /// Появление новой еды
@@ -84,6 +84,11 @@ namespace AgarioModels.Game
     /// Умершие игроки и время, которое осталось до их возрождения
     /// </summary>
     private readonly Dictionary<Player, float> _deadPlayers = new();
+
+    /// <summary>
+    /// Объекты, управляющие движением игроков, которые должны управляться компьютером
+    /// </summary>
+    private readonly List<ComputerMovingStrategy> _playersComputerControls = new();
 
     /// <summary>
     /// Ширина
@@ -129,9 +134,12 @@ namespace AgarioModels.Game
     /// Добавление игрока в случайное место на поле
     /// </summary>
     /// <param name="parPlayer">Добавляемый игрок</param>
-    public void AddPlayerOnRandomPosition(Player parPlayer)
+    public void AddPlayerOnRandomPosition(Player parPlayer, ComputerMovingStrategy? parMovingStrategy = null)
     {
       InitializePlayer(parPlayer);
+
+      if (parMovingStrategy != null)
+        _playersComputerControls.Add(parMovingStrategy);
 
       Players.Add(parPlayer);
       PlayerCreated?.Invoke(parPlayer);
@@ -201,6 +209,16 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Обновление состояния игроков, управляемых компьютером
+    /// </summary>
+    /// <param name="parDeltaTime">Изменение внутреннего игрового времени в секундах</param>
+    private void UpdateComputerControlledPlayers(float parDeltaTime)
+    {
+      foreach (ComputerMovingStrategy elPlayerControlStrategy in _playersComputerControls)
+        elPlayerControlStrategy.Update(parDeltaTime);
+    }
+
+    /// <summary>
     /// Обновление состояния игры
     /// </summary>
     /// <param name="parDeltaTime">Изменение внутреннего игрового времени в секундах</param>
@@ -215,6 +233,7 @@ namespace AgarioModels.Game
       UpdateEat(parDeltaTime);
       ProcessEating();
       RebornDeadPlayers(parDeltaTime);
+      UpdateComputerControlledPlayers(parDeltaTime);
     }
 
     /// <summary>
@@ -276,6 +295,17 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Подстройка скорости в зависимости от массы клетки
+    /// </summary>
+    /// <param name="parSpeedVector">Вектор скорости</param>
+    /// <param name="parWeight">Масса клетки</param>
+    /// <returns></returns>
+    private static Vector2 FitSpeedByCellWeight(Vector2 parSpeedVector, float parWeight)
+    {
+      return parSpeedVector * 4 * MathF.Pow(parWeight, -0.42f);
+    }
+
+    /// <summary>
     /// Установка скорости для игрока
     /// </summary>
     /// <param name="parPlayer">Игрок</param>
@@ -284,10 +314,9 @@ namespace AgarioModels.Game
     public void SetSpeedToPlayer(Player parPlayer, Vector2 speedVector)
     {
       // TODO добавить инерционности по желанию
-      // TODO добавить разную скорость разным ячейкам по желанию
       foreach (MovingCell elCell in parPlayer.Cells)
       {
-        elCell.Speed = CalculateRealSpeedVector(speedVector);
+        elCell.Speed = FitSpeedByCellWeight(CalculateRealSpeedVector(speedVector), elCell.Weight);
       }
     }
 

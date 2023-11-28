@@ -142,6 +142,17 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Получение квадрата расстояния между центрами прямоугольников
+    /// </summary>
+    /// <param name="parRectangle1"></param>
+    /// <param name="parRectangle2"></param>
+    /// <returns></returns>
+    public static float DistanceBetweenCentersSquared(Rectangle parRectangle1, Rectangle parRectangle2)
+    {
+      return (GetRectangleCenter(parRectangle1) - GetRectangleCenter(parRectangle2)).LengthSquared();
+    }
+
+    /// <summary>
     /// Расстояние между центрами клеток
     /// </summary>
     /// <param name="parCell1"></param>

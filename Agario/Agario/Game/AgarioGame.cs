@@ -129,6 +129,17 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Добавление игрока, управляемого компьютером
+    /// </summary>
+    /// <param name="parNumber">Номер</param>
+    private void AddComputerControlledPlayer(int parNumber)
+    {
+      Player player = new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}{parNumber}" };
+      ComputerMovingStrategy movingStrategy = new(player, _gameField);
+      _gameField.AddPlayerOnRandomPosition(player, movingStrategy);
+    }
+
+    /// <summary>
     /// Инициализация игрового поля
     /// </summary>
     private void InitializeGameField()
@@ -137,12 +148,12 @@ namespace AgarioModels.Game
 
       _gameField.AddPlayerOnRandomPosition(new() { Name = TEST_PLAYER_NAME });
 
-      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}1" });
-      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}2" });
-      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}3" });
-      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}4" });
-      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}5" });
-      _gameField.AddPlayerOnRandomPosition(new() { Name = $"{COMPUTER_PLAYER_NAME_PREFIX}6" });
+      AddComputerControlledPlayer(1);
+      AddComputerControlledPlayer(2);
+      AddComputerControlledPlayer(3);
+      AddComputerControlledPlayer(4);
+      AddComputerControlledPlayer(5);
+      AddComputerControlledPlayer(6);
 
       _gameField.CreateEat(START_EAT_COUNT);
     }
