@@ -65,6 +65,11 @@ namespace Controllers.Game
     protected abstract void SetHandlerPlayerSpeedSet();
 
     /// <summary>
+    /// Включение обработки разделения игрока
+    /// </summary>
+    protected abstract void SetHandlerPlayerDivided();
+
+    /// <summary>
     /// Выключение обработки установки паузы игроком
     /// </summary>
     protected abstract void ResetHandlerPlayerPaused();
@@ -83,6 +88,11 @@ namespace Controllers.Game
     protected abstract void ResetHandlerPlayerSpeedSet();
 
     /// <summary>
+    /// Выключение обработки разделения игрока
+    /// </summary>
+    protected abstract void ResetHandlerPlayerDivided();
+
+    /// <summary>
     /// Получение представления игры
     /// </summary>
     /// <returns>Представление игры</returns>
@@ -99,6 +109,7 @@ namespace Controllers.Game
       SetHandlerPlayerResumed();
 
       SetHandlerPlayerSpeedSet();
+      SetHandlerPlayerDivided();
 
       _gameInstance.StartGame();
     }
@@ -132,6 +143,7 @@ namespace Controllers.Game
       ResetHandlerPlayerResumed();
 
       ResetHandlerPlayerSpeedSet();
+      ResetHandlerPlayerDivided();
 
       _gameInstance.Stop();
       GoBackCall();
@@ -147,6 +159,16 @@ namespace Controllers.Game
       if (ControlledPlayer == null)
         return;
       _gameInstance.GameField.SetSpeedToPlayer(ControlledPlayer, parSpeed);
+    }
+
+    /// <summary>
+    /// Разделение игрока
+    /// </summary>
+    protected void DividePlayer()
+    {
+      if (ControlledPlayer == null)
+        return;
+      _gameInstance.GameField.DividePlayerQuery(ControlledPlayer);
     }
   }
 }
