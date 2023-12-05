@@ -20,5 +20,9 @@ namespace AgarioModels.Game
     /// Ускорение [(единица расстояния на поле / секунда) / секунда]
     /// </summary>
     public Vector2 Acceleration { get; set; }
+    /// <summary>
+    /// Время с момента последнего деления в секундах
+    /// </summary>
+    public float TimeFromLastDivision { get; set; }
   }
 }

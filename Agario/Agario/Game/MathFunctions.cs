@@ -207,5 +207,28 @@ namespace AgarioModels.Game
         - 1.0f / 2.0f * MathF.Sqrt((-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2));
       return area;
     }
+
+    /// <summary>
+    /// Поиск центра масс для группы ячеек <paramref name="parCells"/>
+    /// </summary>
+    /// <param name="parCells">Группа ячеек</param>
+    /// <returns>Центр масс</returns>
+    public static Vector2 CalculateMassCenter<T>(List<T> parCells) where T : Cell
+    {
+      float xResult = 0;
+      float yResult = 0;
+      int weightSum = 0;
+      for (int i = 0; i < parCells.Count; i++)
+      {
+        Cell cell = parCells[i];
+        int weight = cell.Weight;
+        Vector2 position = cell.Position;
+
+        xResult += weight * position.X;
+        yResult += weight * position.Y;
+        weightSum += weight;
+      }
+      return new(xResult / weightSum, yResult / weightSum);
+    }
   }
 }

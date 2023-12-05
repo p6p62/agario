@@ -18,6 +18,21 @@ namespace AgarioModels.Game
     private const int START_SCORE = 40;
 
     /// <summary>
+    /// Максимальное количество клеток, которое может быть у игрока
+    /// </summary>
+    private const int MAX_CELLS_FOR_PLAYER = 16;
+
+    /// <summary>
+    /// Минимальная масса клетки, при которой ей разрешено разделяться
+    /// </summary>
+    private const int MIN_WEIGHT_FOR_DIVISION = 14;
+
+    /// <summary>
+    /// Минимальный промежуток времени до слияния разделённых клеток в секундах
+    /// </summary>
+    private const float MIN_DURATION_BEFORE_MERGING = 6;
+
+    /// <summary>
     /// Период генерации новой еды (секунды)
     /// </summary>
     private const float EAT_GENERATION_PERIOD = 3;
@@ -37,6 +52,12 @@ namespace AgarioModels.Game
     /// чтобы она считалась съеденной накрывшей клеткой
     /// </summary>
     private const float EAT_OVERLAP_AREA_RATIO = 0.6f;
+
+    /// <summary>
+    /// Соотношение площади перекрытия клеток к площади всей клетки,
+    /// чтобы она могла слиться с другой клеткой
+    /// </summary>
+    private const float MERGE_OVERLAP_AREA_RATIO = 0.2f;
 
     /// <summary>
     /// Относительная разница масс, при превышении которой клетка может съесть меньшую клетку другого
@@ -89,6 +110,11 @@ namespace AgarioModels.Game
     /// Объекты, управляющие движением игроков, которые должны управляться компьютером
     /// </summary>
     private readonly List<ComputerMovingStrategy> _playersComputerControls = new();
+
+    /// <summary>
+    /// Игроки, которые запросили разделение. Фактически разделение происходит в момент вызова Update
+    /// </summary>
+    private readonly List<Player> _playersWhoNeedDivide = new();
 
     /// <summary>
     /// Ширина
@@ -225,8 +251,14 @@ namespace AgarioModels.Game
     public void Update(float parDeltaTime)
     {
       // TODO
+      foreach (Player elPlayer in _playersWhoNeedDivide)
+        DividePlayer(elPlayer);
+      _playersWhoNeedDivide.Clear();
+
       foreach (Player elPlayer in Players)
       {
+        foreach (MovingCell cell in elPlayer.Cells)
+          cell.TimeFromLastDivision += parDeltaTime;
         UpdatePlayerPosition(elPlayer, parDeltaTime);
       }
 
@@ -306,6 +338,45 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Взаимное притяжение разделённых клеток игрока. Не даёт клеткам разбегаться, мягко подталкивая
+    /// друг к другу через изменение направления вектора скорости
+    /// </summary>
+    /// <param name="parPlayer">Игрок</param>
+    /// <param name="speedVector">Вектор желаемой скорости</param>
+    private static void SetSpeedVectorForCellsMutualAttraction(Player parPlayer, Vector2 speedVector)
+    {
+      List<MovingCell> cells = parPlayer.Cells;
+
+      // если не разделено
+      if (parPlayer.Cells.Count == 1)
+        cells[0].Speed = speedVector;
+      else
+      {
+        // стремление к общему центру массы
+        Vector2 massCenter = MathFunctions.CalculateMassCenter(cells);
+        for (int i = 0; i < cells.Count; i++)
+          cells[i].Speed = speedVector + (massCenter - cells[i].Position);
+
+        // с отталкиванием накладывающихся клеток
+        for (int i = 0; i < cells.Count; i++)
+          for (int j = 0; j < cells.Count; j++)
+          {
+            if (i == j)
+              continue;
+
+            // отталкиваются только те клетки, которым пока не разрешено сливаться
+            if (cells[i].TimeFromLastDivision < MIN_DURATION_BEFORE_MERGING
+              && cells[j].TimeFromLastDivision < MIN_DURATION_BEFORE_MERGING
+              && cells[i].IsIntersect(cells[j]))
+            {
+              Vector2 centerConnectionVector = cells[i].Position - cells[j].Position;
+              cells[i].Speed += centerConnectionVector / centerConnectionVector.LengthSquared();
+            }
+          }
+      }
+    }
+
+    /// <summary>
     /// Установка скорости для игрока
     /// </summary>
     /// <param name="parPlayer">Игрок</param>
@@ -314,10 +385,10 @@ namespace AgarioModels.Game
     public void SetSpeedToPlayer(Player parPlayer, Vector2 speedVector)
     {
       // TODO добавить инерционности по желанию
+      SetSpeedVectorForCellsMutualAttraction(parPlayer, speedVector);
+
       foreach (MovingCell elCell in parPlayer.Cells)
-      {
-        elCell.Speed = FitSpeedByCellWeight(CalculateRealSpeedVector(speedVector), elCell.Weight);
-      }
+        elCell.Speed = FitSpeedByCellWeight(CalculateRealSpeedVector(elCell.Speed), elCell.Weight);
     }
 
     /// <summary>
@@ -379,6 +450,59 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Обработка съедания игроком клеток другого игрока
+    /// </summary>
+    /// <param name="parPlayer"></param>
+    /// <param name="parOtherEatedPlayer"></param>
+    private void ProcessEatingOtherPlayer(Player parPlayer, Player parOtherEatedPlayer)
+    {
+      for (int j = 0; j < parPlayer.Cells.Count; j++)
+      {
+        MovingCell elCell = parPlayer.Cells[j];
+        float elCellArea = elCell.Area;
+        for (int i = parOtherEatedPlayer.Cells.Count - 1; i >= 0; i--)
+        {
+          MovingCell otherPlayerCell = parOtherEatedPlayer.Cells[i];
+          float otherCellArea = otherPlayerCell.Area;
+          if (elCellArea > otherCellArea && ((elCellArea - otherCellArea) / elCellArea > EAT_RELATIVE_MASS_DIFFERENCE))
+          {
+            if (MathFunctions.GetIntersectionArea(elCell, otherPlayerCell) / otherCellArea > EAT_OVERLAP_AREA_RATIO)
+              PlayerEatsOtherCell(parPlayer, elCell, parOtherEatedPlayer, otherPlayerCell);
+          }
+        }
+
+        if (parOtherEatedPlayer.Cells.Count == 0)
+          break;
+      }
+    }
+
+    /// <summary>
+    /// Обработка слияния разделённых ячеек одного игрока
+    /// </summary>
+    /// <param name="parPlayer"></param>
+    private void ProcessCellsMerging(Player parPlayer)
+    {
+      for (int j = 0; j < parPlayer.Cells.Count; j++)
+      {
+        MovingCell mergingCell = parPlayer.Cells[j];
+        float mergingCellArea = mergingCell.Area;
+        for (int i = parPlayer.Cells.Count - 1; i >= 0; i--)
+        {
+          MovingCell otherCell = parPlayer.Cells[i];
+          float otherCellArea = otherCell.Area;
+          if (
+            mergingCellArea > otherCellArea
+            && mergingCell.TimeFromLastDivision >= MIN_DURATION_BEFORE_MERGING
+            && otherCell.TimeFromLastDivision >= MIN_DURATION_BEFORE_MERGING)
+          {
+            if (MathFunctions.GetIntersectionArea(mergingCell, otherCell) / otherCellArea > MERGE_OVERLAP_AREA_RATIO)
+              PlayerEatsOtherCell(parPlayer, mergingCell, parPlayer, otherCell);
+          }
+        }
+      }
+    }
+
+    /// <summary>
     /// Обработка съедания игроком клеток других игроков
     /// </summary>
     /// <param name="parPlayer"></param>
@@ -387,25 +511,16 @@ namespace AgarioModels.Game
       MathFunctions.Rectangle playerRectangle = parPlayer.GetBoundingRect();
       foreach (Player elPlayer in Players)
       {
-        if (elPlayer.IsAlive && playerRectangle.IsIntersect(elPlayer.GetBoundingRect()))
+        if (elPlayer.IsAlive)
         {
-          foreach (MovingCell elCell in parPlayer.Cells)
+          // другой игрок
+          if (elPlayer != parPlayer)
           {
-            float elCellArea = elCell.Area;
-            for (int i = elPlayer.Cells.Count - 1; i >= 0; i--)
-            {
-              MovingCell otherPlayerCell = elPlayer.Cells[i];
-              float otherCellArea = otherPlayerCell.Area;
-              if (elCellArea > otherCellArea && ((elCellArea - otherCellArea) / elCellArea > EAT_RELATIVE_MASS_DIFFERENCE))
-              {
-                if (MathFunctions.GetIntersectionArea(elCell, otherPlayerCell) / otherCellArea > EAT_OVERLAP_AREA_RATIO)
-                  PlayerEatsOtherCell(parPlayer, elCell, elPlayer, otherPlayerCell);
-              }
-            }
-
-            if (elPlayer.Cells.Count == 0)
-              break;
+            if (playerRectangle.IsIntersect(elPlayer.GetBoundingRect()))
+              ProcessEatingOtherPlayer(parPlayer, elPlayer);
           }
+          else if (elPlayer.Cells.Count > 1)
+            ProcessCellsMerging(elPlayer);
         }
       }
     }
@@ -447,6 +562,70 @@ namespace AgarioModels.Game
           continue;
         ProcessEatingOtherCellsForPlayer(elPlayer);
         ProcessEatingFoodForPlayer(elPlayer);
+      }
+    }
+
+    /// <summary>
+    /// Вычисляет положение и скорость ячеек после разделения
+    /// </summary>
+    /// <param name="parDividedCell">Разделившаяся ячейка</param>
+    /// <param name="parNewCell">Новая ячейка</param>
+    private static void CalculateSpeedAndPositionAfterCellDivide(MovingCell parDividedCell, MovingCell parNewCell)
+    {
+      parNewCell.Speed = parDividedCell.Speed;
+      Vector2 positionOffsetVector = parDividedCell.Speed / parDividedCell.Speed.Length() * (parDividedCell.Radius + parNewCell.Radius);
+      parNewCell.Position = parDividedCell.Position + positionOffsetVector;
+    }
+
+    /// <summary>
+    /// Разделяет клетку <paramref name="parDividedCell"/> на 2. У <paramref name="parDividedCell"/> меняется
+    /// масса. Возвращает новую появившуюся ячейку
+    /// </summary>
+    /// <param name="parDividedCell">Разделяемая ячейка</param>
+    /// <returns>Новая ячейка, появившаяся из <paramref name="parDividedCell"/></returns>
+    private static MovingCell DivideCell(MovingCell parDividedCell)
+    {
+      int halfWeight = parDividedCell.Weight / 2;
+      parDividedCell.Weight -= halfWeight;
+
+      MovingCell newCell = new() { Weight = halfWeight };
+      CalculateSpeedAndPositionAfterCellDivide(parDividedCell, newCell);
+      return newCell;
+    }
+
+    /// <summary>
+    /// Запрос на разделение игрока <paramref name="parPlayer"/>. Фактическое разделение произойдет при 
+    /// обновлении состояния игры вызовом Update()
+    /// </summary>
+    /// <param name="parPlayer">Игрок, который хочет разделиться</param>
+    public void DividePlayerQuery(Player parPlayer)
+    {
+      _playersWhoNeedDivide.Add(parPlayer);
+    }
+
+    /// <summary>
+    /// Разделение игрока на части
+    /// </summary>
+    /// <param name="parPlayer">Игрок</param>
+    private static void DividePlayer(Player parPlayer)
+    {
+      if (!parPlayer.IsAlive
+        || parPlayer.Cells.Count >= MAX_CELLS_FOR_PLAYER)
+        return;
+
+      int newCellsCount = Math.Min(parPlayer.Cells.Count, MAX_CELLS_FOR_PLAYER - parPlayer.Cells.Count);
+      List<MovingCell> weightDescendingSortedCells = new(parPlayer.Cells);
+      weightDescendingSortedCells.Sort((c1, c2) => c2.Weight - c1.Weight);
+      while (--newCellsCount >= 0)
+      {
+        MovingCell dividedCell = parPlayer.Cells[newCellsCount];
+        if (dividedCell.Weight < MIN_WEIGHT_FOR_DIVISION)
+          continue;
+
+        MovingCell newCell = DivideCell(dividedCell);
+
+        dividedCell.TimeFromLastDivision = newCell.TimeFromLastDivision = 0;
+        parPlayer.Cells.Add(newCell);
       }
     }
   }
