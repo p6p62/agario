@@ -70,6 +70,11 @@ namespace ViewsWPF.Game
     private const int GAME_WINDOW_HEIGHT = 650;
 
     /// <summary>
+    /// Толщина обводки ячейки
+    /// </summary>
+    private const int CELL_BORDER_THICKNESS = 2;
+
+    /// <summary>
     /// Окно игры
     /// </summary>
     private readonly Window _gameWindow;
@@ -176,13 +181,12 @@ namespace ViewsWPF.Game
     /// <returns>Фигура игрока</returns>
     private PlayerFigure CreatePlayerFigure(Player parPlayer)
     {
-      const int STROKE_THICKNESS = 2;
       SolidColorBrush randomColorBrush = new(GetRandomColor());
       List<Ellipse> playerCells = new();
       int count = parPlayer.Cells.Count;
       while (--count >= 0)
       {
-        Ellipse cellFigure = new() { Fill = randomColorBrush, Stroke = _blackSolidBrush, StrokeThickness = STROKE_THICKNESS };
+        Ellipse cellFigure = new() { Fill = randomColorBrush, Stroke = _blackSolidBrush, StrokeThickness = CELL_BORDER_THICKNESS };
         playerCells.Add(cellFigure);
       }
       TextBlock playerText = new() { Text = parPlayer.Name, FontSize = 20 };
@@ -407,7 +411,7 @@ namespace ViewsWPF.Game
     {
       while (count-- > 0)
       {
-        Ellipse cellFigure = new() { Fill = parPlayerFigure.CellFillingBrush };
+        Ellipse cellFigure = new() { Fill = parPlayerFigure.CellFillingBrush, Stroke = _blackSolidBrush, StrokeThickness = CELL_BORDER_THICKNESS };
         parPlayerFigure.CellFigures.Add(cellFigure);
         _gameScreen.Children.Add(cellFigure);
       }

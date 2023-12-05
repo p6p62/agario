@@ -173,16 +173,49 @@ namespace ControllersWPF
       SetPlayerSpeed(speedVector);
     }
 
+    /// <summary>
+    /// Включание обработки управления скоростью клеток игрока
+    /// </summary>
     protected override void SetHandlerPlayerSpeedSet()
     {
       // TODO
       GameInstance.CanRender += PlayerSpeedUpdateHandler;
     }
 
+    /// <summary>
+    /// Выключение обработки управления скоростью клеток игрока
+    /// </summary>
     protected override void ResetHandlerPlayerSpeedSet()
     {
       // TODO
       GameInstance.CanRender -= PlayerSpeedUpdateHandler;
+    }
+
+    /// <summary>
+    /// Обработка разделения игрока
+    /// </summary>
+    /// <param name="parSender"></param>
+    /// <param name="parKeyEventArgs"></param>
+    private void PlayerDivideHandler(object parSender, KeyEventArgs parKeyEventArgs)
+    {
+      if (parKeyEventArgs.Key == Key.Space)
+        DividePlayer();
+    }
+
+    /// <summary>
+    /// Включение обработки разделения игрока
+    /// </summary>
+    protected override void SetHandlerPlayerDivided()
+    {
+      _gameWindow.KeyDown += PlayerDivideHandler;
+    }
+
+    /// <summary>
+    /// Выключение обработки разделения игрока
+    /// </summary>
+    protected override void ResetHandlerPlayerDivided()
+    {
+      _gameWindow.KeyDown -= PlayerDivideHandler;
     }
   }
 }
