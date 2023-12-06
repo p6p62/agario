@@ -42,6 +42,11 @@ namespace AgarioModels.Game
     private const string COMPUTER_PLAYER_NAME_PREFIX = "Computer";
 
     /// <summary>
+    /// Начальное количество еды
+    /// </summary>
+    public const int START_EAT_COUNT = 450;
+
+    /// <summary>
     /// Желаемая частота обновления внутреннего состояния игры
     /// </summary>
     private const int GAME_UPDATES_PER_SECOND = 60;
@@ -144,8 +149,6 @@ namespace AgarioModels.Game
     /// </summary>
     private void InitializeGameField()
     {
-      const int START_EAT_COUNT = 450;
-
       _gameField.AddPlayerOnRandomPosition(new() { Name = TEST_PLAYER_NAME });
 
       AddComputerControlledPlayer(1);

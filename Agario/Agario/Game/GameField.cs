@@ -66,13 +66,18 @@ namespace AgarioModels.Game
     public const float EAT_RELATIVE_MASS_DIFFERENCE = 0.1f;
 
     /// <summary>
+    /// Задержка перед началом движения при старте игры в секундах
+    /// </summary>
+    private const float START_GAME_DELAY = 1.5f;
+
+    /// <summary>
     /// Появление новой еды
     /// </summary>
     public event Action<Cell>? EatCreated;
     /// <summary>
     /// Съедение еды. Параметры Action - еда и игрок
     /// </summary>
-    public event Action<Cell, Player>? FoodEaten;
+    public event Action<Cell, Player?>? FoodEaten;
     /// <summary>
     /// Появление нового игрока
     /// </summary>
@@ -100,6 +105,11 @@ namespace AgarioModels.Game
     /// Время с момента прошлой генерации еды
     /// </summary>
     private float _lastEatGenerationElapsedTime = 0;
+
+    /// <summary>
+    /// Оставшееся время до истечения задержки перед началом игры
+    /// </summary>
+    private float _startGameDelayRemainingTime = START_GAME_DELAY;
 
     /// <summary>
     /// Умершие игроки и время, которое осталось до их возрождения
@@ -251,6 +261,12 @@ namespace AgarioModels.Game
     public void Update(float parDeltaTime)
     {
       // TODO
+      if (_startGameDelayRemainingTime > 0)
+      {
+        _startGameDelayRemainingTime -= parDeltaTime;
+        return;
+      }
+
       foreach (Player elPlayer in _playersWhoNeedDivide)
         DividePlayer(elPlayer);
       _playersWhoNeedDivide.Clear();
@@ -274,7 +290,10 @@ namespace AgarioModels.Game
     /// </summary>
     private void ShuffleSingleCells()
     {
-      // TODO
+      foreach (Cell elEat in Food)
+        _cellPlaceholder.SetRandomPosition(elEat);
+      foreach (Player elPlayer in Players)
+        _cellPlaceholder.SetRandomPosition(elPlayer.Cells[0]);
     }
 
     /// <summary>
@@ -294,13 +313,31 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Возвращает поле к состоянию с начальным количеством еды
+    /// </summary>
+    private void ResetEat()
+    {
+      int delta = Food.Count - AgarioGame.START_EAT_COUNT;
+      if (delta > 0)
+      {
+        while (--delta >= 0)
+        {
+          int lastIndex = Food.Count - 1;
+          FoodEaten?.Invoke(Food[lastIndex], null);
+          Food.RemoveAt(lastIndex);
+        }
+      }
+      else if (delta < 0)
+        CreateEat(-delta);
+    }
+
+    /// <summary>
     /// Сброс состояния игрового поля
     /// </summary>
     public void Reset()
     {
-      // TODO
-      // TODO удаление старых объектов еды
-
+      _startGameDelayRemainingTime = START_GAME_DELAY;
+      ResetEat();
       foreach (Player elPlayer in Players)
         ResetPlayerCells(elPlayer);
       ShuffleSingleCells();
@@ -377,6 +414,24 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Скорректированный вектор скорости для учёта остановки движения клетки при столкновении со стенами
+    /// </summary>
+    /// <param name="parCell">Клетка</param>
+    /// <param name="parSpeed">Скорость до преобразования</param>
+    /// <returns></returns>
+    private Vector2 CorrectSpeedByWallCollisions(MovingCell parCell, Vector2 parSpeed)
+    {
+      Vector2 speed = parSpeed;
+      if ((speed.X > 0 && parCell.Position.X + parCell.Radius >= Width)
+        || (speed.X < 0 && parCell.Position.X - parCell.Radius <= 0))
+        speed.X = 0;
+      if ((speed.Y > 0 && parCell.Position.Y + parCell.Radius >= Height)
+        || (speed.Y < 0 && parCell.Position.Y - parCell.Radius <= 0))
+        speed.Y = 0;
+      return speed;
+    }
+
+    /// <summary>
     /// Установка скорости для игрока
     /// </summary>
     /// <param name="parPlayer">Игрок</param>
@@ -388,7 +443,10 @@ namespace AgarioModels.Game
       SetSpeedVectorForCellsMutualAttraction(parPlayer, speedVector);
 
       foreach (MovingCell elCell in parPlayer.Cells)
-        elCell.Speed = FitSpeedByCellWeight(CalculateRealSpeedVector(elCell.Speed), elCell.Weight);
+      {
+        Vector2 weightCorrectedSpeed = FitSpeedByCellWeight(CalculateRealSpeedVector(elCell.Speed), elCell.Weight);
+        elCell.Speed = CorrectSpeedByWallCollisions(elCell, weightCorrectedSpeed);
+      }
     }
 
     /// <summary>
@@ -570,10 +628,19 @@ namespace AgarioModels.Game
     /// </summary>
     /// <param name="parDividedCell">Разделившаяся ячейка</param>
     /// <param name="parNewCell">Новая ячейка</param>
-    private static void CalculateSpeedAndPositionAfterCellDivide(MovingCell parDividedCell, MovingCell parNewCell)
+    private void CalculateSpeedAndPositionAfterCellDivide(MovingCell parDividedCell, MovingCell parNewCell)
     {
       parNewCell.Speed = parDividedCell.Speed;
-      Vector2 positionOffsetVector = parDividedCell.Speed / parDividedCell.Speed.Length() * (parDividedCell.Radius + parNewCell.Radius);
+
+      Vector2 positionOffsetVector;
+      float speedVectorLength = parDividedCell.Speed.Length();
+      if (speedVectorLength > 0)
+        positionOffsetVector = parDividedCell.Speed / speedVectorLength * (parDividedCell.Radius + parNewCell.Radius);
+      else
+      {
+        Vector2 vectorToCenter = new Vector2(Width, Height) / 2 - parDividedCell.Position;
+        positionOffsetVector = vectorToCenter / vectorToCenter.Length();
+      }
       parNewCell.Position = parDividedCell.Position + positionOffsetVector;
     }
 
@@ -583,7 +650,7 @@ namespace AgarioModels.Game
     /// </summary>
     /// <param name="parDividedCell">Разделяемая ячейка</param>
     /// <returns>Новая ячейка, появившаяся из <paramref name="parDividedCell"/></returns>
-    private static MovingCell DivideCell(MovingCell parDividedCell)
+    private MovingCell DivideCell(MovingCell parDividedCell)
     {
       int halfWeight = parDividedCell.Weight / 2;
       parDividedCell.Weight -= halfWeight;
@@ -607,7 +674,7 @@ namespace AgarioModels.Game
     /// Разделение игрока на части
     /// </summary>
     /// <param name="parPlayer">Игрок</param>
-    private static void DividePlayer(Player parPlayer)
+    private void DividePlayer(Player parPlayer)
     {
       if (!parPlayer.IsAlive
         || parPlayer.Cells.Count >= MAX_CELLS_FOR_PLAYER)
