@@ -63,7 +63,7 @@ namespace ViewsWPF.Game
     /// <summary>
     /// Ширина игрового окна
     /// </summary>
-    private const int GAME_WINDOW_WIDTH = 1000;
+    private const int GAME_WINDOW_WIDTH = 1200;
     /// <summary>
     /// Высота игрового окна
     /// </summary>
@@ -122,6 +122,11 @@ namespace ViewsWPF.Game
     private readonly Line _borderDown;
 
     /// <summary>
+    /// Фигура таблицы лидеров
+    /// </summary>
+    private readonly TextBlock _leaderboard;
+
+    /// <summary>
     /// Инициализация представления игры в WPF
     /// </summary>
     /// <param name="parWindow">Окно игры</param>
@@ -129,6 +134,7 @@ namespace ViewsWPF.Game
     {
       _gameWindow = parWindow;
       (_borderLeft, _borderRight, _borderUp, _borderDown) = CreateFieldBordersShapes();
+      _leaderboard = CreateLeaderboard();
 
       GameInstance.GameField.Players.ForEach(OnPlayerCreated);
       GameInstance.GameField.Food.ForEach(OnEatCreated);
@@ -139,6 +145,28 @@ namespace ViewsWPF.Game
       GameInstance.GameField.EatCreated += OnEatCreated;
       GameInstance.GameField.FoodEaten += OnFoodEaten;
       GameInstance.CanRender += OnCanRender;
+    }
+
+    /// <summary>
+    /// Создание блока таблицы лидеров
+    /// </summary>
+    /// <returns></returns>
+    private TextBlock CreateLeaderboard()
+    {
+      const float X_OFFSET = GAME_WINDOW_WIDTH * 0.75f;
+      const float Y_OFFSET = 20;
+      TextBlock leaderboard = new()
+      {
+        Text = "Таблица лидеров",
+        FontSize = 24,
+        TextAlignment = TextAlignment.Right,
+        Foreground = Brushes.LimeGreen
+      };
+
+      Canvas.SetLeft(leaderboard, X_OFFSET);
+      Canvas.SetTop(leaderboard, Y_OFFSET);
+      _gameScreen.Children.Add(leaderboard);
+      return leaderboard;
     }
 
     /// <summary>
@@ -264,7 +292,7 @@ namespace ViewsWPF.Game
     /// </summary>
     /// <param name="parEat"></param>
     /// <param name="_"></param>
-    private void OnFoodEaten(Cell parEat, Player _)
+    private void OnFoodEaten(Cell parEat, Player? _)
     {
       Application.Current.Dispatcher.Invoke(() =>
       {
@@ -521,6 +549,7 @@ namespace ViewsWPF.Game
 
       DrawFood();
       DrawPlayers();
+      DrawLeaderboard();
     }
 
     /// <summary>
@@ -536,7 +565,22 @@ namespace ViewsWPF.Game
     /// </summary>
     protected override void DrawLeaderboard()
     {
-      // TODO
+      List<Player> livePlayers = new();
+      List<Player> deadPlayers = new();
+      foreach (Player elPlayer in GameInstance.GameField.Players)
+        if (elPlayer.IsAlive)
+          livePlayers.Add(elPlayer);
+        else
+          deadPlayers.Add(elPlayer);
+      livePlayers.Sort((p1, p2) => p2.Score - p1.Score);
+
+      StringBuilder leaderboardText = new("Таблица лидеров\n");
+      foreach (Player elPlayer in livePlayers)
+        leaderboardText.Append(elPlayer.Name).Append(" [").Append(elPlayer.Score).Append("]\n");
+      foreach (Player elPlayer in deadPlayers)
+        leaderboardText.Append(elPlayer.Name).Append(" [").Append("DEAD").Append("]\n");
+
+      _gameScreen.Dispatcher.Invoke(() => _leaderboard.Text = leaderboardText.ToString());
     }
   }
 }
