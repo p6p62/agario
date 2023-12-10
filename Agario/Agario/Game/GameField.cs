@@ -494,6 +494,7 @@ namespace AgarioModels.Game
     /// <param name="parEatedPlayerCell"></param>
     private void PlayerEatsOtherCell(Player parPlayer, MovingCell parPlayerCell, Player parOtherPlayer, MovingCell parEatedPlayerCell)
     {
+      int otherPlayerScore = parOtherPlayer.Score;
       parPlayerCell.Weight += parEatedPlayerCell.Weight;
       parPlayer.Score += parEatedPlayerCell.Weight;
       parOtherPlayer.Score -= parEatedPlayerCell.Weight;
@@ -501,6 +502,7 @@ namespace AgarioModels.Game
       parOtherPlayer.Cells.Remove(parEatedPlayerCell);
       if (parOtherPlayer.Cells.Count == 0)
       {
+        parOtherPlayer.MaxScore = otherPlayerScore;
         parOtherPlayer.IsAlive = false;
         _deadPlayers.Add(parOtherPlayer, 0);
         PlayerDead?.Invoke(parOtherPlayer);

@@ -25,6 +25,11 @@ namespace AgarioModels.Game
     public int Score { get; set; }
 
     /// <summary>
+    /// Максимальный рейтинг за время запуска приложения
+    /// </summary>
+    public int MaxScore { get; set; }
+
+    /// <summary>
     /// Клетки игрока
     /// </summary>
     public List<MovingCell> Cells { get; private set; } = new();

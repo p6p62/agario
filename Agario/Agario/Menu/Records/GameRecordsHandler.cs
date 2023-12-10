@@ -22,12 +22,6 @@ namespace AgarioModels.Menu.Records
     private static readonly RecordsIO _recordsDataIO = new() { MaxStoredRecordsCount = MAX_STORED_RECORDS_COUNT };
 
     /// <summary>
-    /// Запрос имени игрока
-    /// </summary>
-    /// <returns>Имя игрока</returns>
-    protected abstract string GetPlayerName();
-
-    /// <summary>
     /// Получение набора рекордов из _recordsDataIO
     /// </summary>
     /// <returns>Сохраненные игровые рекорды</returns>
@@ -37,11 +31,11 @@ namespace AgarioModels.Menu.Records
     /// Обработка значения рекорда после окончания игры. Сохраняет рекорд по необходимости, запрашивая при этом имя игрока
     /// </summary>
     /// <param name="parRecordValue">Значение рекорда, набранного игроком</param>
-    public void HandleRecordValueOnEndGame(int parRecordValue)
+    public static void HandleRecordValueOnEndGame(int parRecordValue)
     {
       if (_recordsDataIO.IsNeedToStore(parRecordValue))
       {
-        string playerName = GetPlayerName();
+        string playerName = AgarioModels.Game.AgarioGame.GetGameInstance().PlayerName;
         _recordsDataIO.SaveRecord(new(playerName, parRecordValue));
       }
     }
