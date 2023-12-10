@@ -48,6 +48,11 @@ namespace AgarioModels.Game
     private const int PLAYER_REBORN_TIME = 3;
 
     /// <summary>
+    /// Время сохранения максимального рейтинга (в секундах)
+    /// </summary>
+    private const int MAX_SCORE_UPDATE_TIME = 1;
+
+    /// <summary>
     /// Соотношение площади перерытия клетки еды и другой клетки к площади всей клетки еды,
     /// чтобы она считалась съеденной накрывшей клеткой
     /// </summary>
@@ -110,6 +115,11 @@ namespace AgarioModels.Game
     /// Оставшееся время до истечения задержки перед началом игры
     /// </summary>
     private float _startGameDelayRemainingTime = START_GAME_DELAY;
+
+    /// <summary>
+    /// Время с последнего обновления максимального рейтинга
+    /// </summary>
+    private float _maxScoreUpdateElapsedTime = 0;
 
     /// <summary>
     /// Умершие игроки и время, которое осталось до их возрождения
@@ -255,12 +265,27 @@ namespace AgarioModels.Game
     }
 
     /// <summary>
+    /// Обновление максимального счёта
+    /// </summary>
+    /// <param name="parDeltaTime">Изменение внутреннего игрового времени в секундах</param>
+    private void UpdateMaxScore(float parDeltaTime)
+    {
+      _maxScoreUpdateElapsedTime += parDeltaTime;
+      if (_maxScoreUpdateElapsedTime >= MAX_SCORE_UPDATE_TIME)
+      {
+        _maxScoreUpdateElapsedTime = 0;
+        foreach (Player elPlayer in Players)
+          if (elPlayer.Score > elPlayer.MaxScore)
+            elPlayer.MaxScore = elPlayer.Score;
+      }
+    }
+
+    /// <summary>
     /// Обновление состояния игры
     /// </summary>
     /// <param name="parDeltaTime">Изменение внутреннего игрового времени в секундах</param>
     public void Update(float parDeltaTime)
     {
-      // TODO
       if (_startGameDelayRemainingTime > 0)
       {
         _startGameDelayRemainingTime -= parDeltaTime;
@@ -279,6 +304,7 @@ namespace AgarioModels.Game
       }
 
       UpdateEat(parDeltaTime);
+      UpdateMaxScore(parDeltaTime);
       ProcessEating();
       RebornDeadPlayers(parDeltaTime);
       UpdateComputerControlledPlayers(parDeltaTime);
@@ -502,7 +528,8 @@ namespace AgarioModels.Game
       parOtherPlayer.Cells.Remove(parEatedPlayerCell);
       if (parOtherPlayer.Cells.Count == 0)
       {
-        parOtherPlayer.MaxScore = otherPlayerScore;
+        if (otherPlayerScore > parOtherPlayer.MaxScore)
+          parOtherPlayer.MaxScore = otherPlayerScore;
         parOtherPlayer.IsAlive = false;
         _deadPlayers.Add(parOtherPlayer, 0);
         PlayerDead?.Invoke(parOtherPlayer);
