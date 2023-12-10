@@ -47,7 +47,7 @@ namespace AgarioModels.Menu
     /// <summary>
     /// Имя пункта меню
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; set; }
     /// <summary>
     /// Состояние пункта меню
     /// </summary>

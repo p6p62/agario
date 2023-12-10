@@ -113,6 +113,11 @@ namespace AgarioModels.Game
     public GameField GameField { get => _gameField; }
 
     /// <summary>
+    /// Имя игрока
+    /// </summary>
+    public string PlayerName { get; set; } = TEST_PLAYER_NAME;
+
+    /// <summary>
     /// Инициализация экземпляра игры. Модификатор private для реализации шаблона singleton
     /// </summary>
     private AgarioGame()
@@ -149,7 +154,7 @@ namespace AgarioModels.Game
     /// </summary>
     private void InitializeGameField()
     {
-      _gameField.AddPlayerOnRandomPosition(new() { Name = TEST_PLAYER_NAME });
+      _gameField.AddPlayerOnRandomPosition(new() { Name = PlayerName });
 
       AddComputerControlledPlayer(1);
       AddComputerControlledPlayer(2);
