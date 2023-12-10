@@ -30,13 +30,10 @@ namespace ControllersWPF
     /// <param name="parGameWindow">Окно игры</param>
     public GameControllerWPF(Window parGameWindow)
     {
-      // TODO
       _gameWindow = parGameWindow;
       GameView = CreateGameView();
 
       ControlledPlayer = GameInstance.GameField.Players.Find(p => p.Name == AgarioGame.TEST_PLAYER_NAME);
-
-      //// настройка обработки рекордов
     }
 
     /// <summary>
@@ -86,7 +83,6 @@ namespace ControllersWPF
     /// </summary>
     protected override void SetHandlerPlayerExited()
     {
-      // TODO
       _gameWindow.KeyDown += PlayerExitCheck;
     }
 
@@ -95,7 +91,6 @@ namespace ControllersWPF
     /// </summary>
     protected override void SetHandlerPlayerPaused()
     {
-      // TODO
       _gameWindow.KeyDown += PlayerPauseCheck;
     }
 
@@ -104,7 +99,6 @@ namespace ControllersWPF
     /// </summary>
     protected override void SetHandlerPlayerResumed()
     {
-      // TODO
       _gameWindow.KeyDown += PlayerResumeCheck;
     }
 
@@ -113,7 +107,6 @@ namespace ControllersWPF
     /// </summary>
     protected override void ResetHandlerPlayerExited()
     {
-      // TODO
       _gameWindow.KeyDown -= PlayerExitCheck;
     }
 
@@ -122,7 +115,6 @@ namespace ControllersWPF
     /// </summary>
     protected override void ResetHandlerPlayerPaused()
     {
-      // TODO
       _gameWindow.KeyDown -= PlayerPauseCheck;
     }
 
@@ -131,7 +123,6 @@ namespace ControllersWPF
     /// </summary>
     protected override void ResetHandlerPlayerResumed()
     {
-      // TODO
       _gameWindow.KeyDown -= PlayerResumeCheck;
     }
 
@@ -178,7 +169,6 @@ namespace ControllersWPF
     /// </summary>
     protected override void SetHandlerPlayerSpeedSet()
     {
-      // TODO
       GameInstance.CanRender += PlayerSpeedUpdateHandler;
     }
 
@@ -187,7 +177,6 @@ namespace ControllersWPF
     /// </summary>
     protected override void ResetHandlerPlayerSpeedSet()
     {
-      // TODO
       GameInstance.CanRender -= PlayerSpeedUpdateHandler;
     }
 

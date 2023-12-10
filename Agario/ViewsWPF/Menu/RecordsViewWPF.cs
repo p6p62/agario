@@ -115,7 +115,7 @@ namespace ViewsWPF.Menu
       const int RECORD_TEXT_SIZE = 32;
 
       Brush subcaptionBrush = new SolidColorBrush(ViewProperties.MENU_SUBCAPTION_COLOR);
-      List<Record> records = GameRecordsHandlerWPF.GetRecords();
+      List<Record> records = GameRecordsHandler.GetRecords();
       DockPanel captionRow = new();
       captionRow.Children.Add(new TextBlock() { Text = "Имя", Foreground = subcaptionBrush, FontSize = RECORD_TEXT_SIZE, TextAlignment = TextAlignment.Left });
       captionRow.Children.Add(new TextBlock() { Text = "Рейтинг", Foreground = subcaptionBrush, FontSize = RECORD_TEXT_SIZE, TextAlignment = TextAlignment.Right });
