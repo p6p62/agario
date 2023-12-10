@@ -35,7 +35,7 @@ namespace ViewsWPF.Menu
     /// <summary>
     /// Фигура с именем игрока
     /// </summary>
-    private TextBlock _playerNameTextBlock = null!;
+    private TextBox _playerNameTextBox = null!;
 
     /// <summary>
     /// Экран этого представления
@@ -69,17 +69,17 @@ namespace ViewsWPF.Menu
 
       SolidColorBrush textBrush = new(ViewProperties.MENU_SCREENS_TEXT_COLOR);
       TextBlock captionTextBlock = new() { Text = "Имя игрока (редактирование):", FontSize = ViewProperties.MENU_CAPTION_SIZE, Foreground = textBrush, Margin = new(GRID_MARGIN) };
-      _playerNameTextBlock = new() { Text = AgarioGame.TEST_PLAYER_NAME, TextWrapping = TextWrapping.Wrap, Foreground = textBrush, FontSize = ViewProperties.MENU_TEXT_SIZE, Margin = new(GRID_MARGIN) };
+      _playerNameTextBox = new() { Text = AgarioGame.TEST_PLAYER_NAME, TextWrapping = TextWrapping.Wrap, Foreground = textBrush, FontSize = ViewProperties.MENU_TEXT_SIZE, Margin = new(GRID_MARGIN) };
 
       StackPanel bottomPanel = new() { Orientation = Orientation.Vertical, Margin = new(GRID_MARGIN) };
       bottomPanel.Children.Add(new TextBlock() { Text = "Escape - выйти", FontSize = ViewProperties.MENU_TEXT_SIZE, Foreground = new SolidColorBrush(ViewProperties.BACK_BUTTON_COLOR) });
       bottomPanel.Children.Add(new TextBlock() { Text = "Enter - сохранить и выйти", FontSize = ViewProperties.MENU_TEXT_SIZE, Foreground = new SolidColorBrush(ViewProperties.BACK_BUTTON_COLOR) });
 
       Grid.SetRow(captionTextBlock, 0);
-      Grid.SetRow(_playerNameTextBlock, 1);
+      Grid.SetRow(_playerNameTextBox, 1);
       Grid.SetRow(bottomPanel, 2);
       grid.Children.Add(captionTextBlock);
-      grid.Children.Add(_playerNameTextBlock);
+      grid.Children.Add(_playerNameTextBox);
       grid.Children.Add(bottomPanel);
       return grid;
     }
@@ -94,18 +94,15 @@ namespace ViewsWPF.Menu
       switch (parArgs.Key)
       {
         case Key.Enter:
-          NameEditConfirmed?.Invoke(_playerNameTextBlock.Text);
+          NameEditConfirmed?.Invoke(_playerNameTextBox.Text);
           break;
         case Key.Escape:
           GoBackSelected?.Invoke();
           break;
         case Key.Back:
-          string currentInput = _playerNameTextBlock.Text;
+          string currentInput = _playerNameTextBox.Text;
           if (currentInput.Length > 0)
-            _playerNameTextBlock.Text = currentInput[0..^1];
-          break;
-        default:
-          _playerNameTextBlock.Text += parArgs.Key.ToString();
+            _playerNameTextBox.Text = currentInput[0..^1];
           break;
       }
     }
@@ -115,7 +112,7 @@ namespace ViewsWPF.Menu
     /// </summary>
     public override void Draw()
     {
-      _playerNameTextBlock.Text = AgarioGame.GetGameInstance().PlayerName;
+      _playerNameTextBox.Text = AgarioGame.GetGameInstance().PlayerName;
       _screen.Focus();
       _window.Content = _screen;
     }
