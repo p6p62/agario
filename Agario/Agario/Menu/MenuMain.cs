@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AgarioModels.Game;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,10 @@ namespace AgarioModels.Menu
       /// </summary>
       Records,
       /// <summary>
+      /// Имя игрока
+      /// </summary>
+      PlayerName,
+      /// <summary>
       /// Выход
       /// </summary>
       Exit
@@ -43,7 +48,8 @@ namespace AgarioModels.Menu
       Menu menu = new();
       menu.AddItem(new MenuItem((int)MenuItemCodes.StartGame, "Играть"));
       menu.AddItem(new MenuItem((int)MenuItemCodes.About, "Об игре"));
-      menu.AddItem(new MenuItem((int)MenuItemCodes.Records, "Рекорды"));
+      menu.AddItem(new MenuItem((int)MenuItemCodes.Records, "Таблица лидеров"));
+      menu.AddItem(new MenuItem((int)MenuItemCodes.PlayerName, $"Ваше имя: [{AgarioGame.TEST_PLAYER_NAME}]"));
       menu.AddItem(new MenuItem((int)MenuItemCodes.Exit, "Выход"));
       menu.FocusByID((int)MenuItemCodes.StartGame);
       return menu;
