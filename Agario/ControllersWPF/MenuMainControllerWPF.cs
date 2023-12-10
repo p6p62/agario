@@ -35,6 +35,10 @@ namespace ControllersWPF
     /// Контроллер экрана "Рекорды" в WPF
     /// </summary>
     private readonly RecordsControllerWPF _recordsControllerWPF;
+    /// <summary>
+    /// Контроллер пункта настройки имени игрока в WPF
+    /// </summary>
+    private readonly PlayerNameControllerWPF _playerNameControllerWPF;
 
     /// <summary>
     /// Представление меню
@@ -52,16 +56,20 @@ namespace ControllersWPF
       _gameControllerWPF = new(_window);
       _aboutGameControllerWPF = new(_window);
       _recordsControllerWPF = new(_window);
+      _playerNameControllerWPF = new(_window);
 
       Menu[(int)MenuMain.MenuItemCodes.StartGame].Selected += _gameControllerWPF.Start;
       Menu[(int)MenuMain.MenuItemCodes.About].Selected += _aboutGameControllerWPF.Start;
       Menu[(int)MenuMain.MenuItemCodes.Records].Selected += _recordsControllerWPF.Start;
+      Menu[(int)MenuMain.MenuItemCodes.PlayerName].Selected += _playerNameControllerWPF.Start;
       Menu[(int)MenuMain.MenuItemCodes.Exit].Selected += System.Diagnostics.Process.GetCurrentProcess().Kill;
 
-      // TODO
       _gameControllerWPF.GoToBack += DrawMenu;
       _aboutGameControllerWPF.GoToBack += DrawMenu;
       _recordsControllerWPF.GoToBack += DrawMenu;
+      _playerNameControllerWPF.GoToBack += DrawMenu;
+
+      _playerNameControllerWPF.PlayerNameChanged += s => Menu[(int)MenuMain.MenuItemCodes.PlayerName].Name = $"Ваше имя: [{s}]";
     }
 
     /// <summary>

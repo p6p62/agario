@@ -48,6 +48,11 @@ namespace ViewsWPF.Menu
     };
 
     /// <summary>
+    /// Пункт меню
+    /// </summary>
+    private readonly MenuItem _menuItem;
+
+    /// <summary>
     /// Логический родитель представления
     /// </summary>
     public FrameworkElement Parent
@@ -66,6 +71,7 @@ namespace ViewsWPF.Menu
     /// <param name="parMenuItem">Элемент меню</param>
     public MenuItemViewWPF(MenuItem parMenuItem) : base(parMenuItem)
     {
+      _menuItem = parMenuItem;
       _menuItemFigure.Text = parMenuItem.Name;
       _menuItemFigure.FontSize = ViewProperties.MENU_CAPTION_SIZE;
       Grid.SetRow(_menuItemFigure, parMenuItem.ID);
@@ -76,6 +82,7 @@ namespace ViewsWPF.Menu
     /// </summary>
     public override void Draw()
     {
+      _menuItemFigure.Text = _menuItem.Name;
       if (MenuElement.State == MenuItem.MenuItemState.Focused)
       {
         _menuItemFigure.Background = new SolidColorBrush(ViewProperties.MENU_ITEMS_BACKGROUND_COLOR);
