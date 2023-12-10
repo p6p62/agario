@@ -1,4 +1,5 @@
 ﻿using AgarioModels.Game;
+using AgarioModels.Menu.Records;
 using Controllers.Menu;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,17 @@ namespace Controllers.Game
     public GameController()
     {
       _gameInstance = AgarioGame.GetGameInstance();
+      _gameInstance.GameField.PlayerDead += UpdateRecordOnPlayerDead;
+    }
+
+    /// <summary>
+    /// Обновляет значение рекорда после смерти игрока
+    /// </summary>
+    /// <param name="parPlayer">Игрок</param>
+    private void UpdateRecordOnPlayerDead(Player parPlayer)
+    {
+      if (parPlayer.Name == _gameInstance.PlayerName)
+        GameRecordsHandler.HandleRecordValueOnEndGame(parPlayer.MaxScore);
     }
 
     /// <summary>
