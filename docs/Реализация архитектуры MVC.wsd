@@ -1,3 +1,16 @@
+@startuml Agario MVC Example
+hide circle
+hide members
+
+class Model
+class View
+class Controller
+
+Model <- Controller
+View <- Controller
+View -> Model
+@enduml
+
 @startuml Agario MVC Linked
 hide circle
 hide members

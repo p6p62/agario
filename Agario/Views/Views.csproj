@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Game\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Agario\AgarioModels.csproj" />
   </ItemGroup>
 
