@@ -59,6 +59,15 @@ namespace Controllers.Game
     }
 
     /// <summary>
+    /// Обновление максимального рейтинга в записях рекордов перед выходом из игры
+    /// </summary>
+    private void UpdateRecordBeforeExit()
+    {
+      if (ControlledPlayer != null)
+        GameRecordsHandler.HandleRecordValueOnEndGame(ControlledPlayer.MaxScore);
+    }
+
+    /// <summary>
     /// Включение обработки установки паузы игроком
     /// </summary>
     protected abstract void SetHandlerPlayerPaused();
@@ -158,6 +167,7 @@ namespace Controllers.Game
       ResetHandlerPlayerDivided();
 
       _gameInstance.Stop();
+      UpdateRecordBeforeExit();
       GoBackCall();
     }
 
