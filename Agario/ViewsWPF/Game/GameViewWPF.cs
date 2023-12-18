@@ -75,6 +75,16 @@ namespace ViewsWPF.Game
     private const int CELL_BORDER_THICKNESS = 2;
 
     /// <summary>
+    /// Отступ слева и сверху от границ окна игры для игрового поля
+    /// </summary>
+    private const int GAME_SCREEN_MARGIN_LEFT_TOP = 50;
+
+    /// <summary>
+    /// Подсказка с допустимыми действиями
+    /// </summary>
+    private const string GAME_ACTIONS_HINT = "Пробел - разделение\nP (en) - пауза\nEnter - возобновить\nEscape - в меню";
+
+    /// <summary>
     /// Окно игры
     /// </summary>
     private readonly Window _gameWindow;
@@ -82,7 +92,7 @@ namespace ViewsWPF.Game
     /// <summary>
     /// Панель для отображения в игровом окне
     /// </summary>
-    private readonly Canvas _gameScreen = new();
+    private readonly Canvas _gameScreen = new() { Margin = new(GAME_SCREEN_MARGIN_LEFT_TOP, GAME_SCREEN_MARGIN_LEFT_TOP, 0, 0) };
 
     /// <summary>
     /// Генератор случайных чисел
@@ -127,6 +137,16 @@ namespace ViewsWPF.Game
     private readonly TextBlock _leaderboard;
 
     /// <summary>
+    /// Фигура с информацией об игре
+    /// </summary>
+    private readonly TextBlock _gameInfo;
+
+    /// <summary>
+    /// Панель для отображения в игровом окне
+    /// </summary>
+    public Canvas GameScreen { get => _gameScreen; }
+
+    /// <summary>
     /// Инициализация представления игры в WPF
     /// </summary>
     /// <param name="parWindow">Окно игры</param>
@@ -135,6 +155,7 @@ namespace ViewsWPF.Game
       _gameWindow = parWindow;
       (_borderLeft, _borderRight, _borderUp, _borderDown) = CreateFieldBordersShapes();
       _leaderboard = CreateLeaderboard();
+      _gameInfo = CreateGameInfo();
 
       GameInstance.GameField.Players.ForEach(OnPlayerCreated);
       GameInstance.GameField.Food.ForEach(OnEatCreated);
@@ -148,13 +169,33 @@ namespace ViewsWPF.Game
     }
 
     /// <summary>
+    /// Создание блока информации об игре
+    /// </summary>
+    /// <returns></returns>
+    private TextBlock CreateGameInfo()
+    {
+      const float X_OFFSET = GAME_WINDOW_WIDTH * 0.75f;
+      const float Y_OFFSET = GAME_WINDOW_HEIGHT * 0.5f;
+      TextBlock gameInfo = new()
+      {
+        Text = "[игра]\n" + GAME_ACTIONS_HINT,
+        FontSize = 24,
+        Foreground = Brushes.Black
+      };
+
+      Canvas.SetLeft(gameInfo, X_OFFSET);
+      Canvas.SetTop(gameInfo, Y_OFFSET);
+      _gameScreen.Children.Add(gameInfo);
+      return gameInfo;
+    }
+
+    /// <summary>
     /// Создание блока таблицы лидеров
     /// </summary>
     /// <returns></returns>
     private TextBlock CreateLeaderboard()
     {
       const float X_OFFSET = GAME_WINDOW_WIDTH * 0.75f;
-      const float Y_OFFSET = 20;
       TextBlock leaderboard = new()
       {
         Text = "Таблица лидеров",
@@ -164,7 +205,7 @@ namespace ViewsWPF.Game
       };
 
       Canvas.SetLeft(leaderboard, X_OFFSET);
-      Canvas.SetTop(leaderboard, Y_OFFSET);
+      Canvas.SetTop(leaderboard, 0);
       _gameScreen.Children.Add(leaderboard);
       return leaderboard;
     }
@@ -319,11 +360,11 @@ namespace ViewsWPF.Game
     /// </summary>
     protected override void OnPause()
     {
-      // TODO
+      _gameInfo.Dispatcher.Invoke(() =>
+      {
+        _gameInfo.Text = "[пауза]\n" + GAME_ACTIONS_HINT;
+      });
       Debug.WriteLine("Paused");
-      Debug.WriteLine("Cam");
-      Debug.WriteLine($"offset {Camera.CameraOffsetX}, {Camera.CameraOffsetY}");
-      Debug.WriteLine($"size w_{Camera.CameraWidth}, h_{Camera.CameraHeight}");
     }
 
     /// <summary>
@@ -331,7 +372,10 @@ namespace ViewsWPF.Game
     /// </summary>
     protected override void OnResume()
     {
-      // TODO
+      _gameInfo.Dispatcher.Invoke(() =>
+      {
+        _gameInfo.Text = "[игра]\n" + GAME_ACTIONS_HINT;
+      });
       Debug.WriteLine("Resumed");
     }
 
@@ -340,7 +384,6 @@ namespace ViewsWPF.Game
     /// </summary>
     protected override void OnStopGame()
     {
-      // TODO
       Debug.WriteLine("Exit from game");
     }
 
@@ -465,9 +508,16 @@ namespace ViewsWPF.Game
     /// Рисование клетки
     /// </summary>
     /// <param name="parCell">Клетка</param>
-    private void DrawCell(Cell parCell)
+    /// <param name="parCellFigure">Фигура клетки на экране</param>
+    private void DrawCell(Cell parCell, Ellipse parCellFigure)
     {
-      // TODO вынести общую часть рисования
+      float cellRadiusOnScreen = Camera.CalculateLineLengthInScreen(parCell.Radius);
+      parCellFigure.Width = 2 * cellRadiusOnScreen;
+      parCellFigure.Height = 2 * cellRadiusOnScreen;
+
+      Vector2 newPosition = Camera.CalculatePointPositionInScreen(parCell.Position);
+      Canvas.SetLeft(parCellFigure, newPosition.X - cellRadiusOnScreen);
+      Canvas.SetTop(parCellFigure, newPosition.Y - cellRadiusOnScreen);
     }
 
     /// <summary>
@@ -476,14 +526,7 @@ namespace ViewsWPF.Game
     /// <param name="parEat">Еда</param>
     private void DrawEat(Cell parEat)
     {
-      Ellipse drawedCellFigure = _eatShapes[parEat];
-      float cellRadiusOnScreen = Camera.CalculateLineLengthInScreen(parEat.Radius);
-      drawedCellFigure.Width = 2 * cellRadiusOnScreen;
-      drawedCellFigure.Height = 2 * cellRadiusOnScreen;
-
-      Vector2 newPosition = Camera.CalculatePointPositionInScreen(parEat.Position);
-      Canvas.SetLeft(drawedCellFigure, newPosition.X - cellRadiusOnScreen);
-      Canvas.SetTop(drawedCellFigure, newPosition.Y - cellRadiusOnScreen);
+      DrawCell(parEat, _eatShapes[parEat]);
     }
 
     /// <summary>
@@ -498,16 +541,7 @@ namespace ViewsWPF.Game
       // клетки
       List<MovingCell> cells = parPlayer.Cells;
       for (int i = 0; i < cells.Count; i++)
-      {
-        Ellipse drawedCellFigure = playerFigure.CellFigures[i];
-        float cellRadiusOnScreen = Camera.CalculateLineLengthInScreen(cells[i].Radius);
-        drawedCellFigure.Width = 2 * cellRadiusOnScreen;
-        drawedCellFigure.Height = 2 * cellRadiusOnScreen;
-
-        Vector2 newPosition = Camera.CalculatePointPositionInScreen(cells[i].Position);
-        Canvas.SetLeft(drawedCellFigure, newPosition.X - cellRadiusOnScreen);
-        Canvas.SetTop(drawedCellFigure, newPosition.Y - cellRadiusOnScreen);
-      }
+        DrawCell(cells[i], playerFigure.CellFigures[i]);
 
       // имя и счёт
       playerFigure.PlayerText.Text = $"{parPlayer.Name}\n{parPlayer.Score}";
@@ -557,7 +591,7 @@ namespace ViewsWPF.Game
     /// </summary>
     protected override void DrawGameInfo()
     {
-      // TODO
+      // реализовано в событиях
     }
 
     /// <summary>

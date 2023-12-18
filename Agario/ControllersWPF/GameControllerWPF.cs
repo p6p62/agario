@@ -8,6 +8,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Views.Game;
 using ViewsWPF.Game;
@@ -25,6 +26,11 @@ namespace ControllersWPF
     private readonly Window _gameWindow;
 
     /// <summary>
+    /// Панель элементами игры в игровом окне
+    /// </summary>
+    private readonly Canvas _gameScreen;
+
+    /// <summary>
     /// Инициализация игрового контроллера и создание представления
     /// </summary>
     /// <param name="parGameWindow">Окно игры</param>
@@ -32,6 +38,7 @@ namespace ControllersWPF
     {
       _gameWindow = parGameWindow;
       GameView = CreateGameView();
+      _gameScreen = ((GameViewWPF)GameView).GameScreen;
 
       ControlledPlayer = GameInstance.GameField.Players.Find(p => p.Name == AgarioGame.TEST_PLAYER_NAME);
     }
@@ -151,7 +158,7 @@ namespace ControllersWPF
       Point mousePosition;
       Application.Current.Dispatcher.Invoke(() =>
       {
-        mousePosition = Mouse.GetPosition(_gameWindow);
+        mousePosition = Mouse.GetPosition(_gameScreen);
       });
       Vector2 playerCenterScreenPosition = CalculatePlayerScreenPosition();
       Vector2 speedVector = new((float)mousePosition.X - playerCenterScreenPosition.X, (float)mousePosition.Y - playerCenterScreenPosition.Y);
