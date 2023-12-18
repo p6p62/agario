@@ -46,12 +46,12 @@ namespace ControllersConsole
       _aboutGameControllerConsole = new();
       _recordsControllerConsole = new();
 
-      Menu[(int)MenuMain.MenuItemCodes.StartGame].Selected += _gameControllerConsole.StartGame;
+      Menu[(int)MenuMain.MenuItemCodes.StartGame].Selected += _gameControllerConsole.Start;
       Menu[(int)MenuMain.MenuItemCodes.About].Selected += _aboutGameControllerConsole.Start;
       Menu[(int)MenuMain.MenuItemCodes.Records].Selected += _recordsControllerConsole.Start;
       Menu[(int)MenuMain.MenuItemCodes.Exit].Selected += System.Diagnostics.Process.GetCurrentProcess().Kill;
 
-      // TODO GetGameInstance().GameOver += () => { _menuView.Draw(); _needExit = false; };
+      _gameControllerConsole.GoToBack += Start;
       _aboutGameControllerConsole.GoToBack += Start;
       _recordsControllerConsole.GoToBack += Start;
     }
@@ -65,7 +65,7 @@ namespace ControllersConsole
       _needExit = false;
       do
       {
-        ConsoleKeyInfo keyInfo = Console.ReadKey();
+        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
         switch (keyInfo.Key)
         {
           case ConsoleKey.UpArrow:

@@ -27,7 +27,7 @@ namespace ControllersConsole
       bool needExit = false;
       do
       {
-        ConsoleKeyInfo keyInfo = Console.ReadKey();
+        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
         switch (keyInfo.Key)
         {
           case ConsoleKey.Enter:

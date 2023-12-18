@@ -37,9 +37,9 @@ namespace ViewsConsole.Menu
     }
 
     /// <summary>
-    /// Настройка отображения консоли
+    /// Установка размеров консоли для отображения меню
     /// </summary>
-    private void InitializeMenuView()
+    private static void SetConsoleParametersForMenu()
     {
       if (OperatingSystem.IsWindows())
       {
@@ -49,6 +49,14 @@ namespace ViewsConsole.Menu
         Console.CursorVisible = false;
         Console.Title = GAME_TITLE;
       }
+    }
+
+    /// <summary>
+    /// Настройка отображения консоли
+    /// </summary>
+    private void InitializeMenuView()
+    {
+      SetConsoleParametersForMenu();
 
       // чтобы дождаться обновления заголовка, инача вызов не находит дескриптор окна
       ConsoleHelperUtilite.WaitSomeEmpiricalTimeInterval();
@@ -82,6 +90,7 @@ namespace ViewsConsole.Menu
     /// </summary>
     public override void Draw()
     {
+      SetConsoleParametersForMenu();
       Console.BackgroundColor = ViewsProperties.MENU_BACKGROUND_COLOR;
       Console.ForegroundColor = ViewsProperties.TEXT_COLOR;
       Console.Clear();
