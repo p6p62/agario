@@ -37,7 +37,7 @@ namespace ViewsConsole.Menu
       Console.Write(SCORE_TITLE);
 
       Console.ForegroundColor = ViewsProperties.TEXT_COLOR;
-      foreach (Record elRecord in GameRecordsHandlerConsole.GetRecords())
+      foreach (Record elRecord in GameRecordsHandler.GetRecords())
       {
         Console.SetCursorPosition(0, rowNumber);
         Console.Write(elRecord.Name);
