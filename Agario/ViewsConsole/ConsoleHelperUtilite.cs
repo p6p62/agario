@@ -14,7 +14,7 @@ namespace ViewsConsole
   /// <summary>
   /// Вспомогательный класс-прослойка между вызовами WINAPI
   /// </summary>
-  internal static class ConsoleHelperUtilite
+  public static class ConsoleHelperUtilite
   {
     /// <summary>
     /// Флаг "Не изменять размеры окна", сохраняет автонастройку
@@ -232,6 +232,29 @@ namespace ViewsConsole
     /// <returns></returns>
     [DllImport("user32.dll")]
     private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+
+    /// <summary>
+    /// Получение прямоугольника окна консоли
+    /// </summary>
+    /// <param name="hwnd">Дескриптор окна консоли</param>
+    /// <param name="rect">Прямоугольник</param>
+    /// <returns></returns>
+    [DllImport("user32.dll")]
+    private static extern int GetWindowRect(IntPtr hwnd, out Rectangle rect);
+
+    /// <summary>
+    /// Получение прямоугольника окна консоли
+    /// </summary>
+    /// <param name="parConsoleWindowHandler">Дескриптор окна консоли</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException">Выбрасывается при возникшей ошибке в момент вызова функции платформы</exception>
+    public static Rectangle GetConsoleWindowRectangle(IntPtr parConsoleWindowHandler)
+    {
+      int result = GetWindowRect(parConsoleWindowHandler, out Rectangle outRect);
+      if (result == 0)
+        throw new InvalidOperationException("Ошибка получения размеров окна консоли");
+      return outRect;
+    }
 
     /// <summary>
     /// Ожидание достаточно долгого интервала времени, чтобы системные вызовы и инициализация успели сработать. 

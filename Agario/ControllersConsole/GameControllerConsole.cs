@@ -2,11 +2,16 @@
 using Controllers.Game;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Views.Game;
+using ViewsConsole;
 using ViewsConsole.Game;
+using ViewsConsole.Menu;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ControllersConsole
 {
@@ -26,14 +31,32 @@ namespace ControllersConsole
     private volatile bool _needExit = false;
 
     /// <summary>
+    /// Дескриптор окна консоли
+    /// </summary>
+    private IntPtr _consoleWindowHandler = IntPtr.Zero;
+
+    /// <summary>
+    /// Прямоугольник окна консоли
+    /// </summary>
+    private Rectangle _consoleWindowRect;
+
+    /// <summary>
+    /// Множитель размера окна по X
+    /// </summary>
+    private int _xSizeMultiplier = 1;
+
+    /// <summary>
+    /// Множитель размера окна по Y
+    /// </summary>
+    private int _ySizeMultiplier = 1;
+
+    /// <summary>
     /// Инициализация контроллера игры, создание представления
     /// </summary>
     public GameControllerConsole()
     {
-      // TODO
       GameView = CreateGameView();
       ControlledPlayer = GameInstance.GameField.Players.Find(p => p.Name == AgarioGame.TEST_PLAYER_NAME);
-      //GetGameInstance().GameOver += () => _needExit = true;
     }
 
     /// <summary>
@@ -42,13 +65,52 @@ namespace ControllersConsole
     public override void Start()
     {
       base.Start();
-      // TODO
+      _consoleWindowHandler = ConsoleHelperUtilite.GetConsoleWindowHandle(MenuViewConsole.GAME_TITLE);
+      _consoleWindowRect = ConsoleHelperUtilite.GetConsoleWindowRectangle(_consoleWindowHandler);
+      _xSizeMultiplier = _consoleWindowRect.Width / GameViewConsole.GAME_CONSOLE_WIDTH;
+      _ySizeMultiplier = _consoleWindowRect.Height / GameViewConsole.GAME_CONSOLE_HEIGHT;
+
       _needExit = false;
       do
       {
         ConsoleKeyInfo key = Console.ReadKey(true);
         KeyDown?.Invoke(key);
       } while (!_needExit);
+    }
+
+    /// <summary>
+    /// Возвращает положение центра игрока на экране
+    /// </summary>
+    /// <returns></returns>
+    private Vector2 CalculatePlayerScreenPosition()
+    {
+      Camera camera = GameView.Camera;
+      Vector2 coordinatesSum = new();
+      foreach (Cell elCell in ControlledPlayer!.Cells)
+        coordinatesSum += camera.CalculatePointPositionInScreen(elCell.Position);
+      return coordinatesSum / ControlledPlayer!.Cells.Count;
+    }
+
+    /// <summary>
+    /// Исполнитель действия по обновлению скорости игрока
+    /// </summary>
+    private void PlayerSpeedUpdateHandler()
+    {
+      if (ControlledPlayer == null)
+        return;
+
+      ConsoleHelperUtilite.Point mousePosition = ConsoleHelperUtilite.GetCursorPosition(_consoleWindowHandler);
+      Vector2 playerCenterScreenPosition = CalculatePlayerScreenPosition();
+      playerCenterScreenPosition.X *= _xSizeMultiplier;
+      playerCenterScreenPosition.Y *= _ySizeMultiplier;
+      Vector2 speedVector = new((float)mousePosition.X - playerCenterScreenPosition.X, (float)mousePosition.Y - playerCenterScreenPosition.Y);
+
+      // TODO починить при наличии зависимости от масштаба
+      // перевод в размеры, сопоставимые с игровым полем
+      const float MULTIPLIER = 3;
+      speedVector *= GameView.Camera.CameraToScreenScaleFactor * MULTIPLIER;
+
+      SetPlayerSpeed(speedVector);
     }
 
     /// <summary>
@@ -140,7 +202,7 @@ namespace ControllersConsole
     /// </summary>
     protected override void ResetHandlerPlayerSpeedSet()
     {
-      // TODO player speed set reset
+      GameInstance.CanRender -= PlayerSpeedUpdateHandler;
     }
 
     /// <summary>
@@ -180,7 +242,7 @@ namespace ControllersConsole
     /// </summary>
     protected override void SetHandlerPlayerSpeedSet()
     {
-      // TODO player speed set
+      GameInstance.CanRender += PlayerSpeedUpdateHandler;
     }
   }
 }

@@ -22,21 +22,16 @@ namespace ViewsConsole.Game
     /// <summary>
     /// Ширина игрового окна консоли
     /// </summary>
-    private const int GAME_CONSOLE_WIDTH = 110;
+    public const int GAME_CONSOLE_WIDTH = 110;
     /// <summary>
     /// Высота игрового окна консоли
     /// </summary>
-    private const int GAME_CONSOLE_HEIGHT = 35;
+    public const int GAME_CONSOLE_HEIGHT = 35;
 
     /// <summary>
     /// Длина буфера для консоли
     /// </summary>
     private const int CONSOLE_BUFFER_LENGTH = GAME_CONSOLE_WIDTH * GAME_CONSOLE_HEIGHT;
-
-    /// <summary>
-    /// Дескриптор окна консоли
-    /// </summary>
-    private IntPtr _consoleWindowHandler = IntPtr.Zero;
 
     /// <summary>
     /// Дескриптор вывода консоли
@@ -191,9 +186,6 @@ namespace ViewsConsole.Game
       List<Player> drawedPlayers = Camera.GetPlayersInViewport();
       foreach (Player elPlayer in drawedPlayers)
         DrawPlayer(elPlayer);
-
-      ConsoleHelperUtilite.Point p = ConsoleHelperUtilite.GetCursorPosition(_consoleWindowHandler);
-      Debug.WriteLine($"mouse {p.X}, {p.Y}");
     }
 
     /// <summary>
@@ -349,7 +341,6 @@ namespace ViewsConsole.Game
         Console.BufferWidth = GAME_CONSOLE_WIDTH;
         Console.BufferHeight = GAME_CONSOLE_HEIGHT;
       }
-      _consoleWindowHandler = ConsoleHelperUtilite.GetConsoleWindowHandle(MenuViewConsole.GAME_TITLE);
     }
 
     /// <summary>
