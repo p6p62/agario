@@ -90,6 +90,7 @@ namespace ViewsConsole.Menu
     /// </summary>
     public override void Draw()
     {
+      ConsoleHelperUtilite.ChangeConsoleCP();
       SetConsoleParametersForMenu();
       Console.BackgroundColor = ViewsProperties.MENU_BACKGROUND_COLOR;
       Console.ForegroundColor = ViewsProperties.TEXT_COLOR;

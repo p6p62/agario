@@ -27,5 +27,13 @@ namespace ViewsConsole
     /// Цвет кнопки возврата
     /// </summary>
     public const ConsoleColor BACK_BUTTON_COLOR = ConsoleColor.DarkRed;
+    /// <summary>
+    /// Цвет фона игры
+    /// </summary>
+    public const ConsoleColor GAME_BACKGROUND_COLOR = ConsoleColor.Black;
+    /// <summary>
+    /// Цвет текста игры
+    /// </summary>
+    public const ConsoleColor GAME_TEXT_COLOR = ConsoleColor.White;
   }
 }
