@@ -30,10 +30,10 @@ namespace ViewsConsole
     /// <summary>
     /// Цвет фона игры
     /// </summary>
-    public const ConsoleColor GAME_BACKGROUND_COLOR = ConsoleColor.Black;
+    public const ConsoleColor GAME_BACKGROUND_COLOR = ConsoleColor.White;
     /// <summary>
     /// Цвет текста игры
     /// </summary>
-    public const ConsoleColor GAME_TEXT_COLOR = ConsoleColor.White;
+    public const ConsoleColor GAME_TEXT_COLOR = ConsoleColor.Black;
   }
 }

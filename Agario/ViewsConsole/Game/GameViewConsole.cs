@@ -34,6 +34,11 @@ namespace ViewsConsole.Game
     private const int CONSOLE_BUFFER_LENGTH = GAME_CONSOLE_WIDTH * GAME_CONSOLE_HEIGHT;
 
     /// <summary>
+    /// Смещение для битового сдвига влево, чтобы настроить цвет фона консоли
+    /// </summary>
+    private const int LEFT_BYTE_SHIFT_OFFSET_FOR_BACKGROUND_COLOR = 4;
+
+    /// <summary>
     /// Дескриптор вывода консоли
     /// </summary>
     private readonly SafeFileHandle _handleConsoleOut;
@@ -109,7 +114,7 @@ namespace ViewsConsole.Game
         return;
 
       int offset = parY * GAME_CONSOLE_WIDTH + parX;
-      _consoleBuffer[offset].Attributes = (short)parColor;
+      _consoleBuffer[offset].Attributes = (short)(((short)parColor) | ((short)ViewsProperties.GAME_BACKGROUND_COLOR) << LEFT_BYTE_SHIFT_OFFSET_FOR_BACKGROUND_COLOR);
       _consoleBuffer[offset].Char.UnicodeChar = parChar;
     }
 
@@ -203,22 +208,22 @@ namespace ViewsConsole.Game
       int xRight = (int)rightUpGameFieldCornerOnScreen.X;
       for (int y = (int)leftUpGameFieldCornerOnScreen.Y; y <= (int)leftDownGameFieldCornerOnScreen.Y; y++)
       {
-        PlaceCharToBuffer(xLeft, y, ConsoleColor.White, '\xB3');
-        PlaceCharToBuffer(xRight, y, ConsoleColor.White, '\xB3');
+        PlaceCharToBuffer(xLeft, y, ViewsProperties.GAME_TEXT_COLOR, '\xB3');
+        PlaceCharToBuffer(xRight, y, ViewsProperties.GAME_TEXT_COLOR, '\xB3');
       }
 
       int yUp = (int)leftUpGameFieldCornerOnScreen.Y;
       int yDown = (int)leftDownGameFieldCornerOnScreen.Y;
       for (int x = (int)leftUpGameFieldCornerOnScreen.X; x <= (int)rightUpGameFieldCornerOnScreen.X; x++)
       {
-        PlaceCharToBuffer(x, yUp, ConsoleColor.White, '\xC4');
-        PlaceCharToBuffer(x, yDown, ConsoleColor.White, '\xC4');
+        PlaceCharToBuffer(x, yUp, ViewsProperties.GAME_TEXT_COLOR, '\xC4');
+        PlaceCharToBuffer(x, yDown, ViewsProperties.GAME_TEXT_COLOR, '\xC4');
       }
 
-      PlaceCharToBuffer((int)leftUpGameFieldCornerOnScreen.X, (int)leftUpGameFieldCornerOnScreen.Y, ConsoleColor.White, '\xDA');
-      PlaceCharToBuffer((int)leftDownGameFieldCornerOnScreen.X, (int)leftDownGameFieldCornerOnScreen.Y, ConsoleColor.White, '\xC0');
-      PlaceCharToBuffer((int)rightUpGameFieldCornerOnScreen.X, (int)rightUpGameFieldCornerOnScreen.Y, ConsoleColor.White, '\xBF');
-      PlaceCharToBuffer((int)rightDownGameFieldCornerOnScreen.X, (int)rightDownGameFieldCornerOnScreen.Y, ConsoleColor.White, '\xD9');
+      PlaceCharToBuffer((int)leftUpGameFieldCornerOnScreen.X, (int)leftUpGameFieldCornerOnScreen.Y, ViewsProperties.GAME_TEXT_COLOR, '\xDA');
+      PlaceCharToBuffer((int)leftDownGameFieldCornerOnScreen.X, (int)leftDownGameFieldCornerOnScreen.Y, ViewsProperties.GAME_TEXT_COLOR, '\xC0');
+      PlaceCharToBuffer((int)rightUpGameFieldCornerOnScreen.X, (int)rightUpGameFieldCornerOnScreen.Y, ViewsProperties.GAME_TEXT_COLOR, '\xBF');
+      PlaceCharToBuffer((int)rightDownGameFieldCornerOnScreen.X, (int)rightDownGameFieldCornerOnScreen.Y, ViewsProperties.GAME_TEXT_COLOR, '\xD9');
     }
 
     /// <summary>
@@ -226,7 +231,7 @@ namespace ViewsConsole.Game
     /// </summary>
     private void ClearConsoleBuffer()
     {
-      Array.Fill(_consoleBuffer, new() { Char = new() { UnicodeChar = ' ' } });
+      Array.Fill(_consoleBuffer, new() { Char = new() { UnicodeChar = ' ' }, Attributes = (short)ViewsProperties.GAME_BACKGROUND_COLOR << LEFT_BYTE_SHIFT_OFFSET_FOR_BACKGROUND_COLOR });
     }
 
     /// <summary>
@@ -341,6 +346,8 @@ namespace ViewsConsole.Game
         Console.BufferWidth = GAME_CONSOLE_WIDTH;
         Console.BufferHeight = GAME_CONSOLE_HEIGHT;
       }
+      Console.BackgroundColor = ViewsProperties.GAME_BACKGROUND_COLOR;
+      Console.ForegroundColor = ViewsProperties.GAME_TEXT_COLOR;
     }
 
     /// <summary>
