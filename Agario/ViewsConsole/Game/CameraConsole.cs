@@ -40,7 +40,6 @@ namespace ViewsConsole.Game
        * игрока меняются так, что масштабный коэффициент остаётся внутри интервала, то ничего не происходит*/
       const float MIN_PLAYER_TO_VIEWPORT_SCALE_FACTOR = 0.3f;
       const float MAX_PLAYER_TO_VIEWPORT_SCALE_FACTOR = 0.8f;
-      const float SCALE_FACTOR_AFTER_ADJUST = 0.5f;
 
       if (TrackedPlayer == null || TrackedPlayer.Cells.Count == 0)
         return;
@@ -51,7 +50,11 @@ namespace ViewsConsole.Game
         && (scaleFactor < MIN_PLAYER_TO_VIEWPORT_SCALE_FACTOR
         || scaleFactor > MAX_PLAYER_TO_VIEWPORT_SCALE_FACTOR))
       {
-        CameraHeight = playerRadiusOnScreen / SCALE_FACTOR_AFTER_ADJUST;
+        float factor =
+          scaleFactor > MAX_PLAYER_TO_VIEWPORT_SCALE_FACTOR
+          ? MAX_PLAYER_TO_VIEWPORT_SCALE_FACTOR
+          : MIN_PLAYER_TO_VIEWPORT_SCALE_FACTOR;
+        CameraHeight = playerRadiusOnScreen / factor;
       }
     }
 

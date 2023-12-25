@@ -3,6 +3,7 @@ using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -300,6 +301,8 @@ namespace ViewsConsole.Game
 
       DrawEat();
       DrawPlayers();
+      DrawLeaderboard();
+      DrawGameInfo();
     }
 
     /// <summary>
@@ -307,7 +310,30 @@ namespace ViewsConsole.Game
     /// </summary>
     protected override void DrawGameInfo()
     {
-      throw new NotImplementedException();
+      const int RIGHT_OFFSET = 20;
+      const int BOTTOM_OFFSET = 5;
+
+      int x = GAME_CONSOLE_WIDTH - RIGHT_OFFSET - 1;
+      int y = GAME_CONSOLE_HEIGHT - BOTTOM_OFFSET - 1;
+      PrintString("Space - Divide", ViewsProperties.GAME_TEXT_COLOR, x, y++);
+      PrintString("P(en) - Pause", ViewsProperties.GAME_TEXT_COLOR, x, y++);
+      PrintString("Enter - Resume", ViewsProperties.GAME_TEXT_COLOR, x, y++);
+      PrintString("Escape - Back to menu", ViewsProperties.GAME_TEXT_COLOR, x, y++);
+    }
+
+    /// <summary>
+    /// Выводит строку <paramref name="parString"/> с началом в точке (<paramref name="parX"/>, <paramref name="parY"/>)
+    /// цветом <paramref name="parColor"/>. Без переносов, при нехватке места строка отсечётся
+    /// </summary>
+    /// <param name="parString"></param>
+    /// <param name="parColor"></param>
+    /// <param name="parX"></param>
+    /// <param name="parY"></param>
+    private void PrintString(string parString, ConsoleColor parColor, int parX, int parY)
+    {
+      int l = parString.Length;
+      for (int i = 0; i < l; ++i)
+        PlaceCharToBuffer(parX++, parY, parColor, parString[i]);
     }
 
     /// <summary>
@@ -315,7 +341,28 @@ namespace ViewsConsole.Game
     /// </summary>
     protected override void DrawLeaderboard()
     {
-      throw new NotImplementedException();
+      const int RIGHT_OFFSET = 20;
+
+      // отбор
+      List<Player> livePlayers = new();
+      List<Player> deadPlayers = new();
+      foreach (Player elPlayer in GameInstance.GameField.Players)
+        if (elPlayer.IsAlive)
+          livePlayers.Add(elPlayer);
+        else
+          deadPlayers.Add(elPlayer);
+      livePlayers.Sort((p1, p2) => p2.Score - p1.Score);
+
+      // вывод
+      int x = GAME_CONSOLE_WIDTH - RIGHT_OFFSET - 1;
+      int y = 0;
+      PrintString("Leaderboard", ViewsProperties.GAME_TEXT_COLOR, x, y);
+
+      foreach (Player elPlayer in livePlayers)
+        PrintString($"{elPlayer.Name} [{elPlayer.Score}]", _playerColors[elPlayer], x, ++y);
+
+      foreach (Player elPlayer in deadPlayers)
+        PrintString($"{elPlayer.Name} [DEAD]", _playerColors[elPlayer], x, ++y);
     }
 
     /// <summary>
