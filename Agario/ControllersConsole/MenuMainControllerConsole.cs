@@ -31,6 +31,10 @@ namespace ControllersConsole
     /// </summary>
     private readonly RecordsControllerConsole _recordsControllerConsole;
     /// <summary>
+    /// Контроллер пункта настройки имени игрока
+    /// </summary>
+    private readonly PlayerNameControllerConsole _playerNameControllerConsole;
+    /// <summary>
     /// Флаг продолжения нахождения в меню
     /// </summary>
     private volatile bool _needExit = false;
@@ -45,15 +49,20 @@ namespace ControllersConsole
       _gameControllerConsole = new();
       _aboutGameControllerConsole = new();
       _recordsControllerConsole = new();
+      _playerNameControllerConsole = new();
 
       Menu[(int)MenuMain.MenuItemCodes.StartGame].Selected += _gameControllerConsole.Start;
       Menu[(int)MenuMain.MenuItemCodes.About].Selected += _aboutGameControllerConsole.Start;
       Menu[(int)MenuMain.MenuItemCodes.Records].Selected += _recordsControllerConsole.Start;
+      Menu[(int)MenuMain.MenuItemCodes.PlayerName].Selected += _playerNameControllerConsole.Start;
       Menu[(int)MenuMain.MenuItemCodes.Exit].Selected += System.Diagnostics.Process.GetCurrentProcess().Kill;
 
       _gameControllerConsole.GoToBack += Start;
       _aboutGameControllerConsole.GoToBack += Start;
       _recordsControllerConsole.GoToBack += Start;
+      _playerNameControllerConsole.GoToBack += Start;
+
+      _playerNameControllerConsole.PlayerNameChanged += s => Menu[(int)MenuMain.MenuItemCodes.PlayerName].Name = $"Ваше имя: [{s}]";
     }
 
     /// <summary>
