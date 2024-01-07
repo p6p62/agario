@@ -117,7 +117,7 @@ namespace AgarioModels.Game
     /// <returns></returns>
     public static bool IsIntersect(Cell parCell1, Cell parCell2)
     {
-      return Distance(parCell1, parCell2) >= parCell1.Radius + parCell2.Radius;
+      return Distance(parCell1, parCell2) < parCell1.Radius + parCell2.Radius;
     }
 
     /// <summary>
@@ -218,6 +218,9 @@ namespace AgarioModels.Game
       float xResult = 0;
       float yResult = 0;
       int weightSum = 0;
+
+      if (parCells.Count == 0)
+        return Vector2.Zero;
       for (int i = 0; i < parCells.Count; i++)
       {
         Cell cell = parCells[i];
