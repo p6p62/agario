@@ -198,7 +198,6 @@ namespace AgarioModels.Game
     /// <param name="parDeltaTime">Временной интервал, на который надо сделать интерполяцию</param>
     private static void UpdatePlayerPosition(Player parPlayer, float parDeltaTime)
     {
-      // TODO по желанию добавить клеткам инерционности
       foreach (MovingCell elCell in parPlayer.Cells)
       {
         Vector2 accelerationPerFrame = elCell.Acceleration * parDeltaTime;
@@ -377,7 +376,6 @@ namespace AgarioModels.Game
     /// <returns></returns>
     public static Vector2 CalculateRealSpeedVector(Vector2 parDesiredSpeedVector)
     {
-      // TODO
       const float MULTIPLIER = 0.8f;
       const float MAX_SPEED_VALUE = 13;
       Vector2 result = parDesiredSpeedVector * MULTIPLIER;
@@ -465,7 +463,6 @@ namespace AgarioModels.Game
     /// смасштабирован до соответствия ему</param>
     public void SetSpeedToPlayer(Player parPlayer, Vector2 speedVector)
     {
-      // TODO добавить инерционности по желанию
       SetSpeedVectorForCellsMutualAttraction(parPlayer, speedVector);
 
       foreach (MovingCell elCell in parPlayer.Cells)

@@ -105,7 +105,6 @@ namespace ControllersConsole
       playerCenterScreenPosition.Y *= _ySizeMultiplier;
       Vector2 speedVector = new((float)mousePosition.X - playerCenterScreenPosition.X, (float)mousePosition.Y - playerCenterScreenPosition.Y);
 
-      // TODO починить при наличии зависимости от масштаба
       // перевод в размеры, сопоставимые с игровым полем
       const float MULTIPLIER = 3;
       speedVector *= GameView.Camera.CameraToScreenScaleFactor * MULTIPLIER;

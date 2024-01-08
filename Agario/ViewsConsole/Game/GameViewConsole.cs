@@ -188,7 +188,6 @@ namespace ViewsConsole.Game
     /// </summary>
     private void DrawPlayers()
     {
-      // TODO
       List<Player> drawedPlayers = Camera.GetPlayersInViewport();
       foreach (Player elPlayer in drawedPlayers)
         DrawPlayer(elPlayer);
@@ -240,7 +239,6 @@ namespace ViewsConsole.Game
     /// </summary>
     private void Render()
     {
-      // TODO
       Camera.Update();
       ClearConsoleBuffer();
       DrawGameField();

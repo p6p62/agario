@@ -171,7 +171,6 @@ namespace AgarioModels.Game
     /// </summary>
     public void StartGame()
     {
-      // TODO
       if (_state == State.Active)
         return;
 
@@ -191,7 +190,6 @@ namespace AgarioModels.Game
     /// </summary>
     public void Pause()
     {
-      // TODO
       // приостановить можно только запущенную игру
       if (_state != State.Active)
         return;
@@ -206,7 +204,6 @@ namespace AgarioModels.Game
     /// </summary>
     public void Resume()
     {
-      // TODO
       // возобновить можно только приостановленную игру
       if (_state != State.Pause)
         return;
@@ -221,7 +218,6 @@ namespace AgarioModels.Game
     /// </summary>
     public void Stop()
     {
-      // TODO
       // сброс возможен из любого состояния, повторый сброс бесполезен
       if (_state == State.StopAndNeedReset)
         return;
@@ -245,7 +241,6 @@ namespace AgarioModels.Game
         double previousTime = timer.Elapsed.TotalSeconds;
         double lagSeconds = 0;
 
-        // TODO по надобности уточнить условие цикла при выходе из игры или прерывании
         while (true)
         {
           try
@@ -272,7 +267,6 @@ namespace AgarioModels.Game
             lagSeconds -= UPDATE_PERIOD_SECONDS;
           }
 
-          // TODO сделать интерполяцию по остатку lagSeconds в случае "рваного" движения
           _gameInstance.CanRender?.Invoke();
         }
       });

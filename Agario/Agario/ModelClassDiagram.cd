@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="AgarioModels.Game.Cell" Collapsed="true">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAJAAAAAAAAEAAgAAAAAAAAACAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Game\Cell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgarioModels.Game.Player">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AQAIAAAAAAAAAAgAAAIAAAQAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Game\Player.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgarioModels.Game.MovingCell" Collapsed="true">
+    <Position X="6.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAABAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Game\MovingCell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgarioModels.Game.GameField">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>EDQCAAEgFAyRFQL6ABCIGGAQMAEjIACAJFAAEgEQAYE=</HashCode>
+      <FileName>Game\GameField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgarioModels.Game.AgarioGame">
+    <Position X="1" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="AgarioModels.Game.AgarioGame.State" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Game\AgarioGame.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>BgEgAwAAAAAQABABAAAIiAAggAEAAAgAIAAAApgiAEE=</HashCode>
+      <FileName>Game\AgarioGame.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgarioModels.Game.MathFunctions" Collapsed="true">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAABAAEAAAgAAQAAAAAAgAAABAAAAAAQAACAA=</HashCode>
+      <FileName>Game\MathFunctions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgarioModels.Game.CellPlaceholder" Collapsed="true">
+    <Position X="9" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAABAAAAE=</HashCode>
+      <FileName>Game\CellPlaceholder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgarioModels.Game.ComputerMovingStrategy" Collapsed="true">
+    <Position X="8.75" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>EAQAAAQAgAAAAAAAAARAAjgAAAAAAIAAEAAAQBAAAAA=</HashCode>
+      <FileName>Game\ComputerMovingStrategy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

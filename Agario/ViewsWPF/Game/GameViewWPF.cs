@@ -268,7 +268,6 @@ namespace ViewsWPF.Game
     /// <param name="parPlayer">Добавленный игрок</param>
     private void OnPlayerCreated(Player parPlayer)
     {
-      // TODO
       if (_playerShapes.ContainsKey(parPlayer))
         return;
 
@@ -315,7 +314,6 @@ namespace ViewsWPF.Game
     /// <param name="parEat">Добавленная еда</param>
     private void OnEatCreated(Cell parEat)
     {
-      // TODO
       if (_eatShapes.ContainsKey(parEat))
         return;
 
@@ -348,7 +346,6 @@ namespace ViewsWPF.Game
     /// </summary>
     protected override void OnStartGame()
     {
-      // TODO
       _gameWindow.Width = GAME_WINDOW_WIDTH;
       _gameWindow.Height = GAME_WINDOW_HEIGHT;
       _gameWindow.Content = _gameScreen;
@@ -408,7 +405,6 @@ namespace ViewsWPF.Game
     /// </summary>
     private void OnCanRender()
     {
-      // TODO
       Application.Current.Dispatcher.Invoke(() =>
       {
         Render();
@@ -420,7 +416,6 @@ namespace ViewsWPF.Game
     /// </summary>
     private void Render()
     {
-      // TODO
       Camera.Update();
       DrawGameField();
     }
@@ -430,7 +425,6 @@ namespace ViewsWPF.Game
     /// </summary>
     private void DrawGameFieldBorders()
     {
-      // TODO
       Camera camera = Camera;
       GameField gameField = GameInstance.GameField;
       Vector2 leftUpGameFieldCornerOnScreen = camera.CalculatePointPositionInScreen(new(0, 0));
@@ -556,7 +550,6 @@ namespace ViewsWPF.Game
     /// </summary>
     private void DrawPlayers()
     {
-      // TODO
       List<Player> drawedPlayers = Camera.GetPlayersInViewport();
       foreach (Player elPlayer in drawedPlayers)
         DrawPlayer(elPlayer);
@@ -577,7 +570,6 @@ namespace ViewsWPF.Game
     /// </summary>
     protected override void DrawGameField()
     {
-      // TODO
       if (Camera.IsGameFieldBordersInViewPort())
         DrawGameFieldBorders();
 

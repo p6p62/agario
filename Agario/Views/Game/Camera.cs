@@ -163,7 +163,6 @@ namespace Views.Game
       if (TrackedPlayer is null || TrackedPlayer.Cells.Count == 0)
         return;
 
-      // TODO сейчас выравнивается на наибольшей клетке игрока. Переделать на геометрический центр
       Cell maxCell = TrackedPlayer.Cells.MaxBy(c => c.Weight)!;
       CameraOffsetX = maxCell.Position.X - CameraWidth / 2;
       CameraOffsetY = maxCell.Position.Y - CameraHeight / 2;
@@ -244,7 +243,6 @@ namespace Views.Game
     /// <returns>Длина линии в пикселях</returns>
     public float CalculateLineLengthInScreen(float parLineLengthReal)
     {
-      // TODO
       return parLineLengthReal / CameraToScreenScaleFactor;
     }
 
@@ -256,7 +254,6 @@ namespace Views.Game
     /// <returns>Координаты экрана, где должна быть нарисована эта точка</returns>
     public Vector2 CalculatePointPositionInScreen(Vector2 parPoint)
     {
-      // TODO проверить при вылете объектов за экран
       Vector2 result = new(parPoint.X - CameraOffsetX, parPoint.Y - CameraOffsetY);
       result.X /= CameraToScreenScaleFactor;
       result.Y /= CameraToScreenScaleFactor;

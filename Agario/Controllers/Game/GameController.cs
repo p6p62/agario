@@ -124,7 +124,6 @@ namespace Controllers.Game
     /// </summary>
     public override void Start()
     {
-      // TODO
       SetHandlerPlayerExited();
       SetHandlerPlayerPaused();
       SetHandlerPlayerResumed();
@@ -140,7 +139,6 @@ namespace Controllers.Game
     /// </summary>
     protected void PauseGame()
     {
-      // TODO
       _gameInstance.Pause();
     }
 
@@ -149,7 +147,6 @@ namespace Controllers.Game
     /// </summary>
     protected void ResumeGame()
     {
-      // TODO
       _gameInstance.Resume();
     }
 
@@ -158,7 +155,6 @@ namespace Controllers.Game
     /// </summary>
     protected void StopGame()
     {
-      // TODO
       ResetHandlerPlayerExited();
       ResetHandlerPlayerPaused();
       ResetHandlerPlayerResumed();

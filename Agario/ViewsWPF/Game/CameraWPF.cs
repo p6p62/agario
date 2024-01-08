@@ -34,7 +34,6 @@ namespace ViewsWPF.Game
     /// </summary>
     public override void Update()
     {
-      // TODO изменение масштаба камеры при отображении части игрового поля по мере роста массы игрока
       CenterOnTrackedPlayer();
     }
   }

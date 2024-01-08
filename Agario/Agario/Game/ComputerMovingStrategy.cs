@@ -71,7 +71,6 @@ namespace AgarioModels.Game
     /// <returns>Вектор скорости, позволяющий поймать игрока <paramref name="parPlayer"/></returns>
     private Vector2 CatchPlayer(Player parPlayer)
     {
-      // TODO по желанию сделать поправки на скорость
       return GetRectangleCenter(parPlayer.GetBoundingRect()) - _boundingRectCenter;
     }
 
@@ -82,7 +81,6 @@ namespace AgarioModels.Game
     /// <returns>Вектор скорости, позволяющий сбежать от игрока <paramref name="parPlayer"/></returns>
     private Vector2 EscapeFromPlayer(Player parPlayer)
     {
-      // TODO
       return _boundingRectCenter - GetRectangleCenter(parPlayer.GetBoundingRect());
     }
 

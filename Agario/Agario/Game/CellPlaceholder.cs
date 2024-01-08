@@ -37,8 +37,6 @@ namespace AgarioModels.Game
     /// <param name="parCell">Клетка, которой будет задано случайное положение</param>
     public void SetRandomPosition(Cell parCell)
     {
-      // TODO
-      // TODO проверить на столкновение с едой
       float radius = parCell.Radius;
       float lowerBound = radius;
       float upperBoundX = _gameField.Width - radius;
